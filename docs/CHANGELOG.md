@@ -31,6 +31,7 @@ Format:
 - Adopted `pj14-main` as the local long-lived PJ14 project branch and renamed the official CPA remote to `cpa-official`.
 - Clarified PJ14 repository layout rules for keeping CPA source at the repository root while tracking deployment assets in the same local project.
 - Updated Git ignore rules so `config.yaml` can be tracked while `backups/` remains local-only recovery material.
+- Updated Sub2API bootstrap and verification helpers to read CPA API keys from tracked CPA config files and accept Sub2API verification keys from arguments or environment variables.
 
 ### Fixed
 - Nothing.

@@ -1,0 +1,145 @@
+services:
+  cpa1:
+    image: ${CLI_PROXY_IMAGE:-eceasy/cli-proxy-api:latest}
+    pull_policy: always
+    container_name: cpa1
+    environment:
+      DEPLOY: ${DEPLOY:-}
+    ports:
+      - "127.0.0.1:8317:8317"
+    volumes:
+      - ${CPA1_CONFIG_PATH:-./config.yaml}:/CLIProxyAPI/config.yaml
+      - ${CPA1_AUTH_PATH:-./auths}:/root/.cli-proxy-api
+      - ${CPA1_LOG_PATH:-./logs}:/CLIProxyAPI/logs
+    networks:
+      - cpa-network
+    restart: unless-stopped
+
+  cpa2:
+    image: ${CLI_PROXY_IMAGE:-eceasy/cli-proxy-api:latest}
+    pull_policy: always
+    container_name: cpa2
+    environment:
+      DEPLOY: ${DEPLOY:-}
+    ports:
+      - "127.0.0.1:8318:8317"
+    volumes:
+      - ${CPA2_CONFIG_PATH:-./instances/cpa2/config.yaml}:/CLIProxyAPI/config.yaml
+      - ${CPA2_AUTH_PATH:-./instances/cpa2/auths}:/root/.cli-proxy-api
+      - ${CPA2_LOG_PATH:-./instances/cpa2/logs}:/CLIProxyAPI/logs
+    networks:
+      - cpa-network
+    restart: unless-stopped
+
+  cpa3:
+    image: ${CLI_PROXY_IMAGE:-eceasy/cli-proxy-api:latest}
+    pull_policy: always
+    container_name: cpa3
+    environment:
+      DEPLOY: ${DEPLOY:-}
+    ports:
+      - "127.0.0.1:8319:8317"
+    volumes:
+      - ${CPA3_CONFIG_PATH:-./instances/cpa3/config.yaml}:/CLIProxyAPI/config.yaml
+      - ${CPA3_AUTH_PATH:-./instances/cpa3/auths}:/root/.cli-proxy-api
+      - ${CPA3_LOG_PATH:-./instances/cpa3/logs}:/CLIProxyAPI/logs
+    networks:
+      - cpa-network
+    restart: unless-stopped
+
+  sub2api:
+    image: weishaw/sub2api:latest
+    container_name: sub2api
+    restart: unless-stopped
+    ports:
+      - "${SUB2API_BIND_HOST:-0.0.0.0}:${SUB2API_PORT:-18080}:8080"
+    volumes:
+      - ./sub2api-deploy/data:/app/data
+    environment:
+      AUTO_SETUP: "true"
+      SERVER_HOST: "0.0.0.0"
+      SERVER_PORT: "8080"
+      SERVER_MODE: "${SERVER_MODE:-release}"
+      RUN_MODE: "${RUN_MODE:-standard}"
+      DATABASE_HOST: "sub2api-postgres"
+      DATABASE_PORT: "5432"
+      DATABASE_USER: "${POSTGRES_USER:-sub2api}"
+      DATABASE_PASSWORD: "${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}"
+      DATABASE_DBNAME: "${POSTGRES_DB:-sub2api}"
+      DATABASE_SSLMODE: "disable"
+      REDIS_HOST: "sub2api-redis"
+      REDIS_PORT: "6379"
+      REDIS_PASSWORD: "${REDIS_PASSWORD:-}"
+      REDIS_DB: "${REDIS_DB:-0}"
+      ADMIN_EMAIL: "${ADMIN_EMAIL:-admin@sub2api.local}"
+      ADMIN_PASSWORD: "${ADMIN_PASSWORD:?ADMIN_PASSWORD is required}"
+      JWT_SECRET: "${JWT_SECRET:?JWT_SECRET is required}"
+      JWT_EXPIRE_HOUR: "${JWT_EXPIRE_HOUR:-24}"
+      TOTP_ENCRYPTION_KEY: "${TOTP_ENCRYPTION_KEY:?TOTP_ENCRYPTION_KEY is required}"
+      TZ: "${TZ:-Asia/Shanghai}"
+      SECURITY_URL_ALLOWLIST_ENABLED: "${SECURITY_URL_ALLOWLIST_ENABLED:-false}"
+      SECURITY_URL_ALLOWLIST_ALLOW_INSECURE_HTTP: "${SECURITY_URL_ALLOWLIST_ALLOW_INSECURE_HTTP:-true}"
+      SECURITY_URL_ALLOWLIST_ALLOW_PRIVATE_HOSTS: "${SECURITY_URL_ALLOWLIST_ALLOW_PRIVATE_HOSTS:-true}"
+    depends_on:
+      sub2api-postgres:
+        condition: service_healthy
+      sub2api-redis:
+        condition: service_healthy
+      cpa1:
+        condition: service_started
+      cpa2:
+        condition: service_started
+      cpa3:
+        condition: service_started
+    networks:
+      - cpa-network
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-T", "5", "-O", "/dev/null", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  sub2api-postgres:
+    image: postgres:18-alpine
+    container_name: sub2api-postgres
+    restart: unless-stopped
+    volumes:
+      - ./sub2api-deploy/postgres_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: "${POSTGRES_USER:-sub2api}"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}"
+      POSTGRES_DB: "${POSTGRES_DB:-sub2api}"
+      PGDATA: "/var/lib/postgresql/data"
+      TZ: "${TZ:-Asia/Shanghai}"
+    networks:
+      - cpa-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-sub2api} -d ${POSTGRES_DB:-sub2api}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  sub2api-redis:
+    image: redis:8-alpine
+    container_name: sub2api-redis
+    restart: unless-stopped
+    volumes:
+      - ./sub2api-deploy/redis_data:/data
+    command: >
+      sh -c 'redis-server --save 60 1 --appendonly yes --appendfsync everysec'
+    environment:
+      TZ: "${TZ:-Asia/Shanghai}"
+    networks:
+      - cpa-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+
+networks:
+  cpa-network:
+    driver: bridge
