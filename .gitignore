@@ -3,11 +3,12 @@ cli-proxy-api
 *.exe
 
 # Configuration
-config.yaml
 .env
+!instances/*/config.yaml
 
 # Generated content
 bin/*
+backups/*
 logs/*
 conv/*
 temp/*
@@ -24,9 +25,31 @@ static/*
 # Authentication data
 auths/*
 !auths/.gitkeep
+instances/*/auths/*
+instances/*/logs/*
+!instances/*/auths/.gitkeep
+!instances/*/logs/.gitkeep
+
+# Local Sub2API runtime data
+sub2api-deploy/data/*
+sub2api-deploy/postgres_data/*
+sub2api-deploy/redis_data/*
+sub2api-deploy/cookies.txt
+!sub2api-deploy/data/.gitkeep
+!sub2api-deploy/postgres_data/.gitkeep
+!sub2api-deploy/redis_data/.gitkeep
 
 # Documentation
 docs/*
+!docs/PROJECT_OVERVIEW.md
+!docs/ARCHITECTURE.md
+!docs/DIRECTORY_STRUCTURE.md
+!docs/CODING_STANDARDS.md
+!docs/DOCUMENTATION_STANDARDS.md
+!docs/CHANGELOG.md
+!docs/DECISIONS.md
+!docs/REVIEW_CHECKLIST.md
+!docs/AGENT_WORKFLOW.md
 AGENTS.md
 CLAUDE.md
 GEMINI.md
@@ -51,3 +74,5 @@ _bmad-output/*
 .DS_Store
 ._*
 .gocache/
+__pycache__/
+*.pyc
