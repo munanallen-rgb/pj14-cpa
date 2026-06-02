@@ -1,0 +1,4 @@
+interface:
+  display_name: "PJ14 Auto Backup"
+  short_description: "Back up PJ14 cloud CPA/Sub2API state safely."
+  default_prompt: "Use $pj14-autobackup to back up the PJ14 cloud CPA/Sub2API deployment to local backups."
