@@ -4,6 +4,7 @@ param(
   [int]$Port = 22,
   [string]$RemoteRoot = "/opt/cpa-sub2api",
   [string]$LocalBackupRoot = "backups",
+  [int]$TransferTimeoutSeconds = 1800,
   [switch]$SkipRedis
 )
 
@@ -90,6 +91,22 @@ $sshBaseArgs = @(
   $sshTarget
 )
 
+function Invoke-TransferCommand {
+  param(
+    [Parameter(Mandatory = $true)][string]$FilePath,
+    [Parameter(Mandatory = $true)][string[]]$ArgumentList,
+    [Parameter(Mandatory = $true)][int]$TimeoutSeconds
+  )
+
+  $process = Start-Process -FilePath $FilePath -ArgumentList $ArgumentList -NoNewWindow -PassThru
+  if (-not $process.WaitForExit($TimeoutSeconds * 1000)) {
+    & taskkill.exe /PID $process.Id /T /F | Out-Null
+    return $false
+  }
+
+  return $process.ExitCode -eq 0
+}
+
 Write-Host "Creating remote backup archive on $sshTarget..."
 $remoteOutput = & ssh @sshBaseArgs "printf '%s' '$encoded' | base64 -d | bash"
 if ($LASTEXITCODE -ne 0) {
@@ -104,9 +121,12 @@ if (-not $archiveLine -or -not $shaLine) {
 }
 $remoteArchive = $archiveLine.Substring("ARCHIVE=".Length)
 $remoteSha = $shaLine.Substring("SHA256=".Length)
+$archiveName = Split-Path -Leaf $remoteArchive
+$localArchive = Join-Path $backupDir $archiveName
+$localSha = "$localArchive.sha256"
 
 Write-Host "Downloading archive to $backupDir..."
-& scp @(
+$scpArgs = @(
   "-o", "BatchMode=yes",
   "-o", "ConnectTimeout=60",
   "-o", "ConnectionAttempts=3",
@@ -117,13 +137,15 @@ Write-Host "Downloading archive to $backupDir..."
   "$sshTarget`:$remoteSha",
   $backupDir
 )
-if ($LASTEXITCODE -ne 0) {
-  throw "Download failed. Remote temporary files may remain: $remoteArchive"
+$downloaded = Invoke-TransferCommand -FilePath "scp" -ArgumentList $scpArgs -TimeoutSeconds $TransferTimeoutSeconds
+if (-not $downloaded) {
+  if ((Test-Path -LiteralPath $localArchive) -and (Test-Path -LiteralPath $localSha)) {
+    Write-Warning "scp returned a non-zero exit code after writing local files; continuing with SHA256 validation."
+  } else {
+    throw "Download failed. Remote temporary files may remain: $remoteArchive"
+  }
 }
 
-$archiveName = Split-Path -Leaf $remoteArchive
-$localArchive = Join-Path $backupDir $archiveName
-$localSha = "$localArchive.sha256"
 $expected = (Get-Content -LiteralPath $localSha).Split(" ")[0].Trim().ToLowerInvariant()
 $actual = (Get-FileHash -Algorithm SHA256 -LiteralPath $localArchive).Hash.ToLowerInvariant()
 if ($expected -ne $actual) {

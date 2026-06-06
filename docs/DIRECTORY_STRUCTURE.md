@@ -42,6 +42,7 @@ The cloud deployment path remains `/opt/cpa-sub2api`. First-stage deployments co
 - `assets/`: README and documentation images/assets.
 - `auths/`: default local auth material location; do not commit secrets.
 - `cmd/`: executable entrypoints and small command utilities.
+- `cmd/quota_collector/`: cloud quota collector entrypoint for recording CPA auth quota snapshots.
 - `docs/`: engineering, SDK, and project documentation.
 - `examples/`: runnable examples for SDK or provider usage.
 - `internal/`: private application packages.
@@ -53,6 +54,7 @@ The cloud deployment path remains `/opt/cpa-sub2api`. First-stage deployments co
 - `internal/thinking/`: reasoning config pipeline.
 - `internal/translator/`: protocol translators.
 - `internal/watcher/`: config hot reload and diff/synthesis logic.
+- `internal/quota_collector/`: CPA quota collector configuration, scheduling, report parsing, and Postgres persistence.
 - `sdk/`: public embeddable packages.
 - `sub2api-deploy/`: deployment helper scripts and runbooks.
 - `test/`: cross-module integration tests.

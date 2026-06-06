@@ -21,3 +21,13 @@ This file records important engineering decisions, architecture decisions, techn
 - Reason: This preserves the working local and cloud deployment layout while making future project ownership and update flows clearer.
 - Impact: First-stage deployment continues to produce the existing `/opt/cpa-sub2api` bundle shape. The cloud directory is not converted into a Git checkout in this stage.
 - Follow-up: Add a private `origin` remote later when the user creates one, then push `pj14-main` there.
+
+## DEC-0003: Use a Go Quota Collector with Existing Postgres
+
+- Date: 2026-06-05
+- Status: Accepted
+- Background: PJ14 needs durable CPA auth quota history for future dashboards while Sub2API already runs a Postgres container on the cloud server.
+- Decision: Add a standalone Go `cpa-quota-collector` command that reads CPA management quota reports and writes snapshots under a dedicated `cpa_monitor` Postgres schema in the existing Sub2API Postgres instance. Deploy it as a Docker Compose service built from a locally compiled Linux binary in the cloud bundle.
+- Reason: This avoids a second database, keeps Sub2API business tables untouched, and keeps collector code versioned locally while the cloud bundle only needs the runtime binary.
+- Impact: Cloud deployments include a new `cpa-quota-collector` service, new collector environment variables, and new `cpa_monitor` database tables.
+- Follow-up: Future dashboard work can read `cpa_monitor.cpa_quota_snapshots` together with Sub2API usage tables.

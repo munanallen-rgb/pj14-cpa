@@ -1,7 +1,7 @@
 services:
   cpa1:
     image: ${CLI_PROXY_IMAGE:-eceasy/cli-proxy-api:latest}
-    pull_policy: always
+    pull_policy: ${CLI_PROXY_PULL_POLICY:-always}
     container_name: cpa1
     environment:
       DEPLOY: ${DEPLOY:-}
@@ -17,7 +17,7 @@ services:
 
   cpa2:
     image: ${CLI_PROXY_IMAGE:-eceasy/cli-proxy-api:latest}
-    pull_policy: always
+    pull_policy: ${CLI_PROXY_PULL_POLICY:-always}
     container_name: cpa2
     environment:
       DEPLOY: ${DEPLOY:-}
@@ -33,7 +33,7 @@ services:
 
   cpa3:
     image: ${CLI_PROXY_IMAGE:-eceasy/cli-proxy-api:latest}
-    pull_policy: always
+    pull_policy: ${CLI_PROXY_PULL_POLICY:-always}
     container_name: cpa3
     environment:
       DEPLOY: ${DEPLOY:-}
@@ -99,6 +99,37 @@ services:
       timeout: 10s
       retries: 3
       start_period: 30s
+
+  cpa-quota-collector:
+    build:
+      context: ./sub2api-deploy
+      dockerfile: quota-collector.Dockerfile
+    container_name: cpa-quota-collector
+    restart: unless-stopped
+    environment:
+      TZ: "${TZ:-Asia/Shanghai}"
+      CPA_QUOTA_COLLECTOR_INSTANCES: "${CPA_QUOTA_COLLECTOR_INSTANCES:-cpa1=http://cpa1:8317,cpa2=http://cpa2:8317,cpa3=http://cpa3:8317}"
+      CPA_QUOTA_COLLECTOR_MANAGEMENT_KEY: "${CPA_QUOTA_COLLECTOR_MANAGEMENT_KEY:-}"
+      CPA_QUOTA_COLLECTOR_MANAGEMENT_KEY_CPA1: "${CPA_QUOTA_COLLECTOR_MANAGEMENT_KEY_CPA1:-}"
+      CPA_QUOTA_COLLECTOR_MANAGEMENT_KEY_CPA2: "${CPA_QUOTA_COLLECTOR_MANAGEMENT_KEY_CPA2:-}"
+      CPA_QUOTA_COLLECTOR_MANAGEMENT_KEY_CPA3: "${CPA_QUOTA_COLLECTOR_MANAGEMENT_KEY_CPA3:-}"
+      CPA_QUOTA_DATABASE_HOST: "sub2api-postgres"
+      CPA_QUOTA_DATABASE_PORT: "5432"
+      CPA_QUOTA_DATABASE_USER: "${POSTGRES_USER:-sub2api}"
+      CPA_QUOTA_DATABASE_PASSWORD: "${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}"
+      CPA_QUOTA_DATABASE_NAME: "${POSTGRES_DB:-sub2api}"
+      CPA_QUOTA_DATABASE_SSLMODE: "disable"
+    depends_on:
+      sub2api-postgres:
+        condition: service_healthy
+      cpa1:
+        condition: service_started
+      cpa2:
+        condition: service_started
+      cpa3:
+        condition: service_started
+    networks:
+      - cpa-network
 
   sub2api-postgres:
     image: postgres:18-alpine

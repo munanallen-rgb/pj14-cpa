@@ -21,6 +21,7 @@ func TestGetAuthQuotaReportFiltersProviderAndCountsInvalid(t *testing.T) {
 	if _, errRegister := manager.Register(context.Background(), &coreauth.Auth{
 		ID:       "codex-auth",
 		Provider: "codex",
+		FileName: "codex-auth.json",
 		Metadata: map[string]any{
 			"email": "person@example.com",
 		},
@@ -64,6 +65,9 @@ func TestGetAuthQuotaReportFiltersProviderAndCountsInvalid(t *testing.T) {
 	}
 	if got := resp.Accounts[0].Display; got != "person@example.com" {
 		t.Fatalf("display = %q, want full email", got)
+	}
+	if got := resp.Accounts[0].AuthFile; got != "codex-auth.json" {
+		t.Fatalf("auth_file = %q, want codex-auth.json", got)
 	}
 }
 

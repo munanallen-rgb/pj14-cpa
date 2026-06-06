@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"io"
 	"net/http"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
@@ -26,6 +27,7 @@ type authQuotaReportSummary struct {
 
 type authQuotaReportAccount struct {
 	AuthIndex        string         `json:"auth_index"`
+	AuthFile         string         `json:"auth_file,omitempty"`
 	Provider         string         `json:"provider"`
 	Display          string         `json:"display,omitempty"`
 	Status           string         `json:"status"`
@@ -94,6 +96,7 @@ func (h *Handler) buildQuotaReportAccount(ctx context.Context, auth *coreauth.Au
 	auth.EnsureIndex()
 	entry := authQuotaReportAccount{
 		AuthIndex:        auth.Index,
+		AuthFile:         authFileNameForQuotaReport(auth),
 		Provider:         strings.TrimSpace(auth.Provider),
 		Display:          displayNameForQuotaReport(auth),
 		Status:           "invalid",
@@ -547,6 +550,19 @@ func displayNameForQuotaReport(auth *coreauth.Auth) string {
 	}
 	if auth.FileName != "" {
 		return sanitizeReportReason(auth.FileName)
+	}
+	return sanitizeReportReason(auth.ID)
+}
+
+func authFileNameForQuotaReport(auth *coreauth.Auth) string {
+	if auth == nil {
+		return ""
+	}
+	if name := strings.TrimSpace(auth.FileName); name != "" {
+		return sanitizeReportReason(name)
+	}
+	if path := strings.TrimSpace(authAttribute(auth, "path")); path != "" {
+		return sanitizeReportReason(filepath.Base(path))
 	}
 	return sanitizeReportReason(auth.ID)
 }

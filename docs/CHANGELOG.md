@@ -21,6 +21,47 @@ Format:
 ### Notes
 - ...
 
+## 2026-06-06
+
+### Added
+- Nothing.
+
+### Changed
+- Added a configurable timeout to the PJ14 cloud backup `scp` download step and terminate the full process tree on timeout to avoid orphaned Windows OpenSSH child sessions.
+- Let the PJ14 cloud backup continue to SHA256 validation when `scp` returns a non-zero exit code after writing both downloaded files.
+- Documented PJ14 autobackup transfer pitfalls in the local skill, including slow Windows OpenSSH transfers, misleading `scp` exit codes, and avoiding public HTTP exposure for secret backup archives.
+
+### Fixed
+- Nothing.
+
+### Removed
+- Nothing.
+
+### Notes
+- The backup still verifies SHA256 and `contents.txt` after download before cleaning remote temporary files.
+
+## 2026-06-05
+
+### Added
+- Added a standalone CPA quota collector command that records Codex auth quota snapshots into a dedicated `cpa_monitor` Postgres schema.
+- Added cloud Docker Compose wiring, environment template entries, and bundle export support for the `cpa-quota-collector` service.
+
+### Changed
+- Extended the management auth quota report account payload with an `auth_file` field for durable collector attribution.
+- Documented the quota collector directory responsibilities and the decision to reuse the existing Sub2API Postgres instance with an isolated schema.
+- Updated the cloud bundle exporter to build the quota collector through Docker when a local Go toolchain is unavailable.
+- Allowed cloud Compose config to render before the collector management key is filled, while keeping the key required by the collector at runtime.
+- Made the cloud CPA image pull policy configurable so locally loaded rollout images can be used safely.
+
+### Fixed
+- Nothing.
+
+### Removed
+- Nothing.
+
+### Notes
+- The collector does not modify CPA auth files or Sub2API business tables; dashboard work remains a future step.
+
 ## 2026-06-02
 
 ### Added
