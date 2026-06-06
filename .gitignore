@@ -9,6 +9,7 @@ cli-proxy-api
 # Generated content
 bin/*
 backups/*
+data_compare/
 logs/*
 conv/*
 temp/*
