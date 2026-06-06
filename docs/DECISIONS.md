@@ -31,3 +31,13 @@ This file records important engineering decisions, architecture decisions, techn
 - Reason: This avoids a second database, keeps Sub2API business tables untouched, and keeps collector code versioned locally while the cloud bundle only needs the runtime binary.
 - Impact: Cloud deployments include a new `cpa-quota-collector` service, new collector environment variables, and new `cpa_monitor` database tables.
 - Follow-up: Future dashboard work can read `cpa_monitor.cpa_quota_snapshots` together with Sub2API usage tables.
+
+## DEC-0004: Add a Standalone Read-Only CPA Dashboard
+
+- Date: 2026-06-06
+- Status: Accepted
+- Background: PJ14 needs a product-facing view that aligns CPA weekly quota movement with Sub2API token and cost usage, while keeping the proxy services and quota collector focused on their existing jobs.
+- Decision: Add a standalone Go `cpa-dashboard` command that serves an embedded static dashboard and reads from the existing Sub2API Postgres instance. Deploy it as a separate Docker Compose service with a simple password gate and a dedicated read-only database role.
+- Reason: A separate service keeps dashboard iteration independent from request proxying and quota collection, avoids adding a frontend build toolchain, and preserves the existing single-Postgres deployment model.
+- Impact: Cloud bundles now include a dashboard binary, Dockerfile, compose service, environment variables, and a runbook for creating the read-only database role.
+- Follow-up: Request-level attribution from Sub2API usage to internal CPA auth emails remains out of scope until the proxy/usage pipeline records that relationship.

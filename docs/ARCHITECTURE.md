@@ -7,6 +7,8 @@ The architecture should stay pragmatic: extend existing modules first and add ne
 
 ## Main Module Responsibilities
 - `cmd/server/`: process startup, CLI flags, server wiring.
+- `cmd/cpa_dashboard/`: standalone read-only dashboard process for CPA quota efficiency and Sub2API usage views.
+- `cmd/quota_collector/`: standalone CPA quota collection process for cloud deployments.
 - `internal/api/`: Gin server, protocol multiplexing, request middleware, management endpoints, module registration.
 - `internal/api/modules/amp/`: Amp-specific route support and proxy behavior.
 - `internal/auth/`: provider OAuth/token acquisition and auth file handling.
@@ -19,6 +21,8 @@ The architecture should stay pragmatic: extend existing modules first and add ne
 - `internal/registry/`: model definitions, client-visible models, and updater.
 - `internal/store/`: persistence backends and secret resolution.
 - `internal/cache/`: request signature caching.
+- `internal/cpa_dashboard/`: dashboard config, Postgres reads, quota efficiency calculations, HTTP routes, and embedded static assets.
+- `internal/quota_collector/`: collector config, scheduling, CPA management report fetches, quota parsing, and Postgres writes.
 - `internal/wsrelay/`: WebSocket relay lifecycle.
 - `internal/tui/`: terminal UI.
 - `sdk/`: embeddable public-facing API, auth, config, translation, logging, and access packages.

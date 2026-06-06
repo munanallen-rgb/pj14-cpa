@@ -64,6 +64,45 @@ function Copy-DirectoryContents {
   }
 }
 
+function Build-LinuxGoBinary {
+  param(
+    [string]$CommandPath,
+    [string]$OutputBinary,
+    [string]$DisplayName
+  )
+
+  if (Get-Command go -ErrorAction SilentlyContinue) {
+    $previousGOOS = $env:GOOS
+    $previousGOARCH = $env:GOARCH
+    $previousCGO = $env:CGO_ENABLED
+    try {
+      $env:GOOS = "linux"
+      $env:GOARCH = "amd64"
+      $env:CGO_ENABLED = "0"
+      & go build -o $OutputBinary $CommandPath
+      if ($LASTEXITCODE -ne 0) {
+        throw "Failed to build $DisplayName binary"
+      }
+    } finally {
+      $env:GOOS = $previousGOOS
+      $env:GOARCH = $previousGOARCH
+      $env:CGO_ENABLED = $previousCGO
+    }
+    return
+  }
+
+  if (-not (Get-Command docker -ErrorAction SilentlyContinue)) {
+    throw "Neither go nor docker is available. Install Go 1.26+ or start Docker Desktop before exporting the cloud bundle."
+  }
+
+  $relativePath = $OutputBinary.Substring($rootFullPath.Length).TrimStart("\", "/").Replace("\", "/")
+  $dockerBuildCommand = "CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o ""/app/$relativePath"" $CommandPath"
+  & docker run --rm -v "$($rootFullPath):/app" -w /app golang:1.26-alpine sh -c $dockerBuildCommand
+  if ($LASTEXITCODE -ne 0) {
+    throw "Failed to build $DisplayName binary with Docker"
+  }
+}
+
 if (Test-Path -LiteralPath $outputFullPath) {
   Remove-Item -LiteralPath $outputFullPath -Recurse -Force
 }
@@ -83,8 +122,11 @@ Copy-RequiredFile -RelativePath "sub2api-deploy/deploy-droplet.ps1"
 Copy-RequiredFile -RelativePath "sub2api-deploy/generate-cloud-env.ps1"
 Copy-RequiredFile -RelativePath "sub2api-deploy/cloud_tools.py"
 Copy-RequiredFile -RelativePath "sub2api-deploy/cloud-start.sh"
+Copy-RequiredFile -RelativePath "sub2api-deploy/create-dashboard-db-role.sh"
 Copy-RequiredFile -RelativePath "sub2api-deploy/finalize-local.ps1"
 Copy-RequiredFile -RelativePath "sub2api-deploy/quota-collector.Dockerfile"
+Copy-RequiredFile -RelativePath "sub2api-deploy/cpa-dashboard.Dockerfile"
+Copy-RequiredFile -RelativePath "sub2api-deploy/CPA_DASHBOARD.md"
 
 Ensure-Directory -RelativePath "logs"
 Ensure-Directory -RelativePath "instances/cpa2/logs"
@@ -93,38 +135,13 @@ Ensure-Directory -RelativePath "sub2api-deploy/data"
 Ensure-Directory -RelativePath "sub2api-deploy/postgres_data"
 Ensure-Directory -RelativePath "sub2api-deploy/redis_data"
 Ensure-Directory -RelativePath "sub2api-deploy/quota-collector"
+Ensure-Directory -RelativePath "sub2api-deploy/cpa-dashboard"
 
 $collectorBinary = Join-Path $outputFullPath "sub2api-deploy/quota-collector/quota-collector"
+$dashboardBinary = Join-Path $outputFullPath "sub2api-deploy/cpa-dashboard/cpa-dashboard"
 
-if (Get-Command go -ErrorAction SilentlyContinue) {
-  $previousGOOS = $env:GOOS
-  $previousGOARCH = $env:GOARCH
-  $previousCGO = $env:CGO_ENABLED
-  try {
-    $env:GOOS = "linux"
-    $env:GOARCH = "amd64"
-    $env:CGO_ENABLED = "0"
-    & go build -o $collectorBinary ./cmd/quota_collector
-    if ($LASTEXITCODE -ne 0) {
-      throw "Failed to build quota collector binary"
-    }
-  } finally {
-    $env:GOOS = $previousGOOS
-    $env:GOARCH = $previousGOARCH
-    $env:CGO_ENABLED = $previousCGO
-  }
-} else {
-  if (-not (Get-Command docker -ErrorAction SilentlyContinue)) {
-    throw "Neither go nor docker is available. Install Go 1.26+ or start Docker Desktop before exporting the cloud bundle."
-  }
-
-  $collectorRelativePath = $collectorBinary.Substring($rootFullPath.Length).TrimStart("\", "/").Replace("\", "/")
-  $dockerBuildCommand = "CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o ""/app/$collectorRelativePath"" ./cmd/quota_collector"
-  & docker run --rm -v "$($rootFullPath):/app" -w /app golang:1.26-alpine sh -c $dockerBuildCommand
-  if ($LASTEXITCODE -ne 0) {
-    throw "Failed to build quota collector binary with Docker"
-  }
-}
+Build-LinuxGoBinary -CommandPath "./cmd/quota_collector" -OutputBinary $collectorBinary -DisplayName "quota collector"
+Build-LinuxGoBinary -CommandPath "./cmd/cpa_dashboard" -OutputBinary $dashboardBinary -DisplayName "CPA dashboard"
 
 if ($IncludeAuth) {
   Copy-DirectoryContents -RelativePath "auths"
@@ -145,6 +162,8 @@ $manifest = [PSCustomObject]@{
     "On the droplet, run: cp sub2api-deploy/.env.cloud.example .env",
     "Edit .env secrets, including CPA_QUOTA_COLLECTOR_MANAGEMENT_KEY.",
     "Run: docker compose -f docker-compose.cloud.yml --env-file .env up -d",
+    "Create the read-only CPA dashboard database role: bash sub2api-deploy/create-dashboard-db-role.sh",
+    "Run: docker compose -f docker-compose.cloud.yml --env-file .env up -d cpa-dashboard",
     "Run bootstrap-openai-pool.ps1 from a machine that can reach Sub2API.",
     "Run verify-cpa-pool.ps1 as the final gate."
   )

@@ -24,15 +24,20 @@ Format:
 ## 2026-06-06
 
 ### Added
-- Nothing.
+- Added a standalone `cpa-dashboard` command for viewing CPA quota efficiency, account health, Sub2API usage trends, and read-only auth cleanup candidates.
+- Added cloud Docker Compose wiring, environment template entries, bundle export support, and a deployment runbook for the `cpa-dashboard` service.
+- Added dashboard tests for weekly quota decrease calculations, same-email auth file grouping, normalization, range validation, and password rejection.
 
 ### Changed
 - Added a configurable timeout to the PJ14 cloud backup `scp` download step and terminate the full process tree on timeout to avoid orphaned Windows OpenSSH child sessions.
 - Let the PJ14 cloud backup continue to SHA256 validation when `scp` returns a non-zero exit code after writing both downloaded files.
 - Documented PJ14 autobackup transfer pitfalls in the local skill, including slow Windows OpenSSH transfers, misleading `scp` exit codes, and avoiding public HTTP exposure for secret backup archives.
+- Documented the dashboard directory responsibilities and the decision to keep the dashboard separate from proxying and quota collection.
+- Updated the CPA dashboard monthly estimate multiplier to `4.3`, added monthly estimated quota cost, field help icons, million-token display units, and whole-dollar cost display.
+- Added a browser-only CPA dashboard estimate panel for `预计实际额度RMB`, calculated from monthly estimated quota cost and a user-entered factor that defaults to `0.2`.
 
 ### Fixed
-- Nothing.
+- Fixed CPA dashboard quota efficiency alignment so Sub2API usage and cost are clipped to each CPA instance's successful quota collection window instead of using pre-collector usage from the full selected range.
 
 ### Removed
 - Nothing.

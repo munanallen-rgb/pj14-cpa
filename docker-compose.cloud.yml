@@ -131,6 +131,42 @@ services:
     networks:
       - cpa-network
 
+  cpa-dashboard:
+    build:
+      context: ./sub2api-deploy
+      dockerfile: cpa-dashboard.Dockerfile
+    profiles:
+      - dashboard
+    container_name: cpa-dashboard
+    restart: unless-stopped
+    ports:
+      - "${CPA_DASHBOARD_BIND_HOST:-0.0.0.0}:${CPA_DASHBOARD_PORT:-18090}:18090"
+    environment:
+      TZ: "${TZ:-Asia/Shanghai}"
+      CPA_DASHBOARD_BIND: "0.0.0.0:18090"
+      CPA_DASHBOARD_LOGIN_PASSWORD: "${CPA_DASHBOARD_LOGIN_PASSWORD:?CPA_DASHBOARD_LOGIN_PASSWORD is required}"
+      CPA_DASHBOARD_DATABASE_HOST: "sub2api-postgres"
+      CPA_DASHBOARD_DATABASE_PORT: "5432"
+      CPA_DASHBOARD_DATABASE_USER: "${CPA_DASHBOARD_DATABASE_USER:-sub2api_dashboard}"
+      CPA_DASHBOARD_DATABASE_PASSWORD: "${CPA_DASHBOARD_DATABASE_PASSWORD:?CPA_DASHBOARD_DATABASE_PASSWORD is required}"
+      CPA_DASHBOARD_DATABASE_NAME: "${POSTGRES_DB:-sub2api}"
+      CPA_DASHBOARD_DATABASE_SSLMODE: "disable"
+    depends_on:
+      sub2api-postgres:
+        condition: service_healthy
+      sub2api:
+        condition: service_healthy
+      cpa-quota-collector:
+        condition: service_started
+    networks:
+      - cpa-network
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-T", "5", "-O", "/dev/null", "http://localhost:18090/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
   sub2api-postgres:
     image: postgres:18-alpine
     container_name: sub2api-postgres

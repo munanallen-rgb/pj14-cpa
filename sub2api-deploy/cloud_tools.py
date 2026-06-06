@@ -117,6 +117,11 @@ def cmd_generate_env(args):
         "CPA_QUOTA_COLLECTOR_MANAGEMENT_KEY_CPA1": "",
         "CPA_QUOTA_COLLECTOR_MANAGEMENT_KEY_CPA2": "",
         "CPA_QUOTA_COLLECTOR_MANAGEMENT_KEY_CPA3": "",
+        "CPA_DASHBOARD_BIND_HOST": "0.0.0.0",
+        "CPA_DASHBOARD_PORT": "18090",
+        "CPA_DASHBOARD_LOGIN_PASSWORD": secrets.token_hex(32),
+        "CPA_DASHBOARD_DATABASE_USER": "sub2api_dashboard",
+        "CPA_DASHBOARD_DATABASE_PASSWORD": secrets.token_hex(32),
         "SECURITY_URL_ALLOWLIST_ENABLED": "false",
         "SECURITY_URL_ALLOWLIST_ALLOW_INSECURE_HTTP": "true",
         "SECURITY_URL_ALLOWLIST_ALLOW_PRIVATE_HOSTS": "true",
@@ -129,6 +134,9 @@ def cmd_generate_env(args):
         "output": str(output),
         "admin_email": values["ADMIN_EMAIL"],
         "admin_password": values["ADMIN_PASSWORD"],
+        "dashboard_url": f"http://<server-ip>:{values['CPA_DASHBOARD_PORT']}",
+        "dashboard_password": values["CPA_DASHBOARD_LOGIN_PASSWORD"],
+        "dashboard_database_user": values["CPA_DASHBOARD_DATABASE_USER"],
     }, indent=2))
 
 

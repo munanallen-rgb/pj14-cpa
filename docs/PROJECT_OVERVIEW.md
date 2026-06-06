@@ -20,6 +20,8 @@ Provide a local proxy server that exposes OpenAI/Gemini/Claude/Codex/Grok-compat
 
 ## Main Functional Areas
 - Server entrypoint and CLI flags: `cmd/server/`.
+- CPA quota and usage dashboard entrypoint: `cmd/cpa_dashboard/`.
+- CPA quota collector entrypoint: `cmd/quota_collector/`.
 - HTTP API, protocol routing, middleware, and management handlers: `internal/api/`.
 - Provider authentication: `internal/auth/` and `sdk/auth/`.
 - Runtime provider execution: `internal/runtime/executor/`.
@@ -28,6 +30,7 @@ Provide a local proxy server that exposes OpenAI/Gemini/Claude/Codex/Grok-compat
 - Model registry and updates: `internal/registry/`.
 - Config loading and hot reload: `internal/config/`, `internal/watcher/`.
 - Storage: `internal/store/`.
+- CPA quota monitoring: `internal/quota_collector/` and `internal/cpa_dashboard/`.
 - Embeddable SDK: `sdk/cliproxy/` plus related SDK packages.
 - Integration and compatibility tests: `test/`.
 - Deployment helpers: `Dockerfile`, `docker-compose*.yml`, `sub2api-deploy/`.

@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>CPA Monitor</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <main id="app">
+      <section class="login" id="loginPanel">
+        <div class="login-box">
+          <h1>CPA Monitor</h1>
+          <form id="loginForm">
+            <input id="passwordInput" type="password" autocomplete="current-password" placeholder="Dashboard password" />
+            <button type="submit">登录</button>
+          </form>
+          <p id="loginError"></p>
+        </div>
+      </section>
+
+      <section class="shell hidden" id="dashboardShell">
+        <aside class="sidebar">
+          <div class="brand">CPA Monitor</div>
+          <button class="nav active" data-view="overview">总览</button>
+          <button class="nav" data-view="efficiency">额度效率</button>
+          <button class="nav" data-view="accounts">账号健康</button>
+          <button class="nav" data-view="usage">用量趋势</button>
+          <button class="nav" data-view="cleanup">清理候选</button>
+          <button class="nav subtle" id="logoutButton">退出</button>
+        </aside>
+        <section class="content">
+          <header class="topbar">
+            <div>
+              <h2 id="viewTitle">总览</h2>
+              <p id="viewSubtitle">CPA 额度与 Sub2API 用量</p>
+            </div>
+            <button id="refreshButton">刷新</button>
+          </header>
+
+          <section class="filters">
+            <label>
+              时间范围
+              <select id="rangeSelect">
+                <option value="7">最近7天</option>
+                <option value="1">今天</option>
+                <option value="30">最近30天</option>
+              </select>
+            </label>
+            <label>
+              CPA实例
+              <select id="cpaSelect"><option value="">全部</option></select>
+            </label>
+            <label>
+              模型
+              <select id="modelSelect"><option value="">全部</option></select>
+            </label>
+            <label>
+              API key
+              <select id="apiKeySelect"><option value="">全部</option></select>
+            </label>
+          </section>
+
+          <section id="notice" class="notice hidden"></section>
+          <section id="viewRoot"></section>
+        </section>
+      </section>
+    </main>
+    <script src="/app.js"></script>
+  </body>
+</html>
