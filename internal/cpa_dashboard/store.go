@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"net/url"
 	"strconv"
 	"time"
 
@@ -13,6 +14,30 @@ import (
 // Store reads dashboard data from Postgres.
 type Store struct {
 	pool *pgxpool.Pool
+}
+
+// DatabaseConfig describes the Postgres target used by the capacity reports.
+type DatabaseConfig struct {
+	Host     string
+	Port     int
+	User     string
+	Password string
+	Name     string
+	SSLMode  string
+}
+
+// DSN returns a pgx-compatible Postgres connection string.
+func (c DatabaseConfig) DSN() string {
+	q := url.Values{}
+	q.Set("sslmode", c.SSLMode)
+	u := url.URL{
+		Scheme:   "postgres",
+		User:     url.UserPassword(c.User, c.Password),
+		Host:     fmt.Sprintf("%s:%d", c.Host, c.Port),
+		Path:     "/" + c.Name,
+		RawQuery: q.Encode(),
+	}
+	return u.String()
 }
 
 // NewStore opens a Postgres connection pool.

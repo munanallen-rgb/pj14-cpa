@@ -122,12 +122,9 @@ Copy-RequiredFile -RelativePath "sub2api-deploy/deploy-droplet.ps1"
 Copy-RequiredFile -RelativePath "sub2api-deploy/generate-cloud-env.ps1"
 Copy-RequiredFile -RelativePath "sub2api-deploy/cloud_tools.py"
 Copy-RequiredFile -RelativePath "sub2api-deploy/cloud-start.sh"
-Copy-RequiredFile -RelativePath "sub2api-deploy/create-dashboard-db-role.sh"
 Copy-RequiredFile -RelativePath "sub2api-deploy/finalize-local.ps1"
 Copy-RequiredFile -RelativePath "sub2api-deploy/quota-collector.Dockerfile"
-Copy-RequiredFile -RelativePath "sub2api-deploy/cpa-dashboard.Dockerfile"
 Copy-RequiredFile -RelativePath "sub2api-deploy/portal-api.Dockerfile"
-Copy-RequiredFile -RelativePath "sub2api-deploy/CPA_DASHBOARD.md"
 Copy-RequiredFile -RelativePath "sub2api-deploy/PORTAL_API.md"
 
 Ensure-Directory -RelativePath "logs"
@@ -137,15 +134,12 @@ Ensure-Directory -RelativePath "sub2api-deploy/data"
 Ensure-Directory -RelativePath "sub2api-deploy/postgres_data"
 Ensure-Directory -RelativePath "sub2api-deploy/redis_data"
 Ensure-Directory -RelativePath "sub2api-deploy/quota-collector"
-Ensure-Directory -RelativePath "sub2api-deploy/cpa-dashboard"
 Ensure-Directory -RelativePath "sub2api-deploy/portal-api"
 
 $collectorBinary = Join-Path $outputFullPath "sub2api-deploy/quota-collector/quota-collector"
-$dashboardBinary = Join-Path $outputFullPath "sub2api-deploy/cpa-dashboard/cpa-dashboard"
 $portalBinary = Join-Path $outputFullPath "sub2api-deploy/portal-api/portal-api"
 
 Build-LinuxGoBinary -CommandPath "./cmd/quota_collector" -OutputBinary $collectorBinary -DisplayName "quota collector"
-Build-LinuxGoBinary -CommandPath "./cmd/cpa_dashboard" -OutputBinary $dashboardBinary -DisplayName "CPA dashboard"
 Build-LinuxGoBinary -CommandPath "./cmd/portal_api" -OutputBinary $portalBinary -DisplayName "Portal API"
 
 if ($IncludeAuth) {
@@ -168,8 +162,6 @@ $manifest = [PSCustomObject]@{
     "Edit .env secrets, including CPA_QUOTA_COLLECTOR_MANAGEMENT_KEY.",
     "Run: docker compose -f docker-compose.cloud.yml --env-file .env up -d",
     "Open the Portal API at the configured PORTAL_PORT and sign in with PORTAL_BOOTSTRAP_ADMIN_EMAIL.",
-    "Create the read-only CPA dashboard database role: bash sub2api-deploy/create-dashboard-db-role.sh",
-    "Run: docker compose -f docker-compose.cloud.yml --env-file .env up -d cpa-dashboard",
     "Run bootstrap-openai-pool.ps1 from a machine that can reach Sub2API.",
     "Run verify-cpa-pool.ps1 as the final gate."
   )

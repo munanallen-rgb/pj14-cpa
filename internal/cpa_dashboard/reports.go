@@ -148,6 +148,26 @@ func (s *Service) Overview(ctx context.Context) (OverviewResponse, error) {
 	}, nil
 }
 
+// CurrentAccounts returns the current CPA account health rows.
+func (s *Service) CurrentAccounts(ctx context.Context, cpa string) ([]CPAAccountRow, error) {
+	return s.store.CurrentAccounts(ctx, cpa)
+}
+
+// UsageBuckets returns hourly usage buckets for the selected filter.
+func (s *Service) UsageBuckets(ctx context.Context, filter QueryFilter) ([]UsageBucket, error) {
+	return s.store.UsageBuckets(ctx, filter)
+}
+
+// CleanupCandidates returns read-only auth cleanup candidates.
+func (s *Service) CleanupCandidates(ctx context.Context, cpa string) ([]CleanupCandidate, error) {
+	return s.store.CleanupCandidates(ctx, cpa)
+}
+
+// Filters returns available dashboard filter options.
+func (s *Service) Filters(ctx context.Context) (FiltersResponse, error) {
+	return s.store.Filters(ctx)
+}
+
 func buildEffectiveQuotaWindows(filter QueryFilter, observations []QuotaObservationWindow) []EffectiveQuotaWindow {
 	windows := make([]EffectiveQuotaWindow, 0, len(observations))
 	for _, observation := range observations {

@@ -9,7 +9,7 @@ import (
 
 func TestParseQueryFilterDefaultsToSevenDays(t *testing.T) {
 	req := httptest.NewRequest(http.MethodGet, "/api/quota-efficiency", nil)
-	filter, errFilter := parseQueryFilter(req)
+	filter, errFilter := ParseQueryFilter(req)
 	if errFilter != nil {
 		t.Fatalf("parse query filter: %v", errFilter)
 	}
@@ -23,20 +23,8 @@ func TestParseQueryFilterDefaultsToSevenDays(t *testing.T) {
 
 func TestParseQueryFilterRejectsLongRange(t *testing.T) {
 	req := httptest.NewRequest(http.MethodGet, "/api/quota-efficiency?start=2026-01-01&end=2026-06-01", nil)
-	_, errFilter := parseQueryFilter(req)
+	_, errFilter := ParseQueryFilter(req)
 	if errFilter == nil || !strings.Contains(errFilter.Error(), "90 days") {
 		t.Fatalf("expected max range error, got %v", errFilter)
-	}
-}
-
-func TestSessionRequiresPassword(t *testing.T) {
-	server := &Server{cfg: Config{LoginPassword: "secret"}, sessionToken: "session"}
-	req := httptest.NewRequest(http.MethodPost, "/api/session", strings.NewReader(`{"password":"wrong"}`))
-	rec := httptest.NewRecorder()
-
-	server.handleSession(rec, req)
-
-	if rec.Code != http.StatusUnauthorized {
-		t.Fatalf("status = %d, want %d", rec.Code, http.StatusUnauthorized)
 	}
 }

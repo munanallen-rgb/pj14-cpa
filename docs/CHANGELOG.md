@@ -26,20 +26,24 @@ Format:
 ### Added
 - Added a standalone `portal-api` command and `internal/portal` package for the PJ14 user MVP closed loop: registration/login, Sub2API user mapping, API key creation, user-scoped usage views, manual recharge orders, Portal ledger entries, and Sub2API balance updates.
 - Added an embedded minimal Portal UI for local/cloud MVP validation.
+- Added an admin-only Portal capacity dashboard that reuses CPA dashboard report logic for overview, quota efficiency, account health, usage trend, and cleanup-candidate views.
 - Added cloud Docker Compose wiring, environment template entries, bundle export support, Dockerfile, and Portal runbook for the `portal-api` service.
 - Added Portal tests for configuration loading, internal Sub2API password derivation, key previewing, Sub2API user/key creation, and balance updates.
+- Added Portal admin dashboard authorization coverage.
 
 ### Changed
 - Documented the Portal architecture, directory responsibilities, and decision to keep Portal as a decoupled product boundary backed by the existing Sub2API Postgres database for the MVP.
 - Changed cloud Portal deployment configuration to use a dedicated `PORTAL_SUB2API_ADMIN_EMAIL` and `PORTAL_SUB2API_ADMIN_PASSWORD` service account instead of relying on Sub2API bootstrap admin environment values.
 - Changed generated Portal bootstrap admin defaults to use a Portal-specific email instead of reusing the Sub2API admin email.
 - Restyled the embedded Portal UI with a Sub2API-inspired left-sidebar console layout, split normal-user and admin navigation, and hid Sub2API-internal labels from the normal user experience.
+- Changed the CPA dashboard report service to expose reusable service methods so Portal can call the same report calculations without relying on the standalone `18090` frontend.
+- Changed cloud startup and bundle export flows so Portal admin capacity reports are the supported dashboard surface.
 
 ### Fixed
 - Nothing.
 
 ### Removed
-- Nothing.
+- Removed the standalone `cpa-dashboard` command, embedded standalone dashboard frontend, `18090` Compose service, dashboard Dockerfile, dashboard runbook, and dashboard-specific read-only role setup script.
 
 ### Notes
 - The MVP does not integrate a payment provider or migrate membership data to Supabase; recharge confirmation is manual.

@@ -26,6 +26,7 @@ The embedded MVP UI uses a Sub2API-inspired left-sidebar console layout but keep
 - Normal users see only account overview, API keys, usage, billing, recharge, and integration information.
 - Normal users do not see Sub2API, group, channel, or other gateway-internal labels.
 - Portal admins see a separate operations workspace for recharge review, order status, and configuration-boundary guidance.
+- Portal admins also see an internal capacity dashboard for quota efficiency, account health, usage trend, and read-only cleanup-candidate reports. These views reuse the report logic that previously powered the standalone CPA dashboard.
 - Frontend role-based navigation is only a usability layer; route authorization remains enforced by the Portal API.
 
 ## Runtime Shape
@@ -103,5 +104,11 @@ http://<server-ip>:18100
 - `GET /api/admin/recharge-orders`
 - `POST /api/admin/recharge-orders/{id}/confirm`
 - `POST /api/admin/recharge-orders/{id}/cancel`
+- `GET /api/admin/cpa-dashboard/overview`
+- `GET /api/admin/cpa-dashboard/quota-efficiency`
+- `GET /api/admin/cpa-dashboard/cpa-accounts`
+- `GET /api/admin/cpa-dashboard/usage`
+- `GET /api/admin/cpa-dashboard/cleanup-candidates`
+- `GET /api/admin/cpa-dashboard/filters`
 
 The full API key is returned only once from `POST /api/api-keys`; Portal stores only the Sub2API key id and a preview string.

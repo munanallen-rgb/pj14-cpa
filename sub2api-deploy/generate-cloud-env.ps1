@@ -42,8 +42,6 @@ $adminPassword = New-RandomHex -ByteCount 32
 $postgresPassword = New-RandomHex -ByteCount 32
 $jwtSecret = New-RandomHex -ByteCount 32
 $totpKey = New-RandomHex -ByteCount 32
-$dashboardPassword = New-RandomHex -ByteCount 32
-$dashboardDBPassword = New-RandomHex -ByteCount 32
 $portalSessionSecret = New-RandomHex -ByteCount 32
 $portalAdminEmail = "portal-admin@sub2api.local"
 $portalAdminPassword = New-RandomHex -ByteCount 32
@@ -66,12 +64,6 @@ CPA_QUOTA_COLLECTOR_INSTANCES=cpa1=http://cpa1:8317,cpa2=http://cpa2:8317,cpa3=h
 CPA_QUOTA_COLLECTOR_MANAGEMENT_KEY_CPA1=
 CPA_QUOTA_COLLECTOR_MANAGEMENT_KEY_CPA2=
 CPA_QUOTA_COLLECTOR_MANAGEMENT_KEY_CPA3=
-
-CPA_DASHBOARD_BIND_HOST=0.0.0.0
-CPA_DASHBOARD_PORT=18090
-CPA_DASHBOARD_LOGIN_PASSWORD=$dashboardPassword
-CPA_DASHBOARD_DATABASE_USER=sub2api_dashboard
-CPA_DASHBOARD_DATABASE_PASSWORD=$dashboardDBPassword
 
 PORTAL_BIND_HOST=0.0.0.0
 PORTAL_PORT=18100
@@ -102,11 +94,6 @@ Write-Host ""
 Write-Host "Admin login:"
 Write-Host "  email:    $AdminEmail"
 Write-Host "  password: $adminPassword"
-Write-Host ""
-Write-Host "CPA dashboard:"
-Write-Host "  url:      http://<server-ip>:18090"
-Write-Host "  password: $dashboardPassword"
-Write-Host "  db user:  sub2api_dashboard"
 Write-Host ""
 Write-Host "Portal API:"
 Write-Host "  url:      http://<server-ip>:18100"

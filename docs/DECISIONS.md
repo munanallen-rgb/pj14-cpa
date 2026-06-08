@@ -51,3 +51,23 @@ This file records important engineering decisions, architecture decisions, techn
 - Reason: This keeps Sub2API as the execution gateway while making Portal the product boundary. It avoids adding a new runtime stack or database now, and preserves a clear migration path for future Supabase-based membership features.
 - Impact: Cloud deployments include a new `portal-api` service, Dockerfile, environment variables, bundle export support, Portal schema migrations, and an embedded minimal control panel.
 - Follow-up: Future work can replace Portal's identity, billing, or usage providers without changing the user-facing frontend contract.
+
+## DEC-0006: Reuse CPA Dashboard Reports Inside Portal Admin
+
+- Date: 2026-06-08
+- Status: Superseded by DEC-0007
+- Background: PJ14 needs Portal admins to access the same capacity and quota-efficiency data that the standalone `cpa-dashboard` currently exposes on port `18090`, while preserving Portal as the operator-facing product boundary.
+- Decision: Keep `cpa-dashboard` running unchanged for now, but expose its report calculations through reusable service methods and attach that service to `portal-api`. Portal admin routes under `/api/admin/cpa-dashboard/*` enforce Portal admin authorization and power a new embedded admin capacity dashboard.
+- Reason: This lets Portal develop and validate a replacement dashboard without coupling to the standalone `18090` frontend or its separate password gate.
+- Impact: `portal-api` opens a read connection to the same Postgres database and serves admin-only capacity views.
+- Follow-up: Completed by DEC-0007 after the Portal dashboard was validated.
+
+## DEC-0007: Retire the Standalone `18090` CPA Dashboard
+
+- Date: 2026-06-08
+- Status: Accepted
+- Background: The Portal admin capacity dashboard has been validated as the supported operator surface for quota efficiency, account health, usage trend, and cleanup-candidate reports.
+- Decision: Remove the standalone `cpa-dashboard` command, embedded standalone frontend, Dockerfile, Compose service, dashboard runbook, generated environment variables, bundle export build step, and dashboard-specific read-only role setup script. Keep `internal/cpa_dashboard` as the reusable report package used by Portal admin routes.
+- Reason: This removes the public `18090` surface and its separate password gate without deleting the report queries that Portal needs.
+- Impact: Cloud deployments no longer start or expose `cpa-dashboard`. Portal remains the only dashboard UI, and its admin authorization protects the capacity reports.
+- Follow-up: A later cleanup may rename `internal/cpa_dashboard` to a more neutral report package name after Portal behavior is stable and the extra churn is worth it.

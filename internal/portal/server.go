@@ -11,6 +11,7 @@ import (
 	"strings"
 	"time"
 
+	cpadashboard "github.com/router-for-me/CLIProxyAPI/v7/internal/cpa_dashboard"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -45,6 +46,12 @@ func (s *Server) Handler() http.Handler {
 	mux.HandleFunc("/api/billing/ledger", s.withUser(s.handleLedger))
 	mux.HandleFunc("/api/admin/recharge-orders", s.withAdmin(s.handleAdminRechargeOrders))
 	mux.HandleFunc("/api/admin/recharge-orders/", s.withAdmin(s.handleAdminRechargeOrderAction))
+	mux.HandleFunc("/api/admin/cpa-dashboard/overview", s.withAdmin(s.handleAdminDashboardOverview))
+	mux.HandleFunc("/api/admin/cpa-dashboard/quota-efficiency", s.withAdmin(s.handleAdminDashboardQuotaEfficiency))
+	mux.HandleFunc("/api/admin/cpa-dashboard/cpa-accounts", s.withAdmin(s.handleAdminDashboardCPAAccounts))
+	mux.HandleFunc("/api/admin/cpa-dashboard/usage", s.withAdmin(s.handleAdminDashboardUsage))
+	mux.HandleFunc("/api/admin/cpa-dashboard/cleanup-candidates", s.withAdmin(s.handleAdminDashboardCleanupCandidates))
+	mux.HandleFunc("/api/admin/cpa-dashboard/filters", s.withAdmin(s.handleAdminDashboardFilters))
 	mux.HandleFunc("/", s.handleStatic)
 	return s.withCORS(mux)
 }
@@ -261,6 +268,96 @@ func (s *Server) handleAdminRechargeOrderAction(w http.ResponseWriter, r *http.R
 	default:
 		writeError(w, http.StatusNotFound, "not found")
 	}
+}
+
+func (s *Server) handleAdminDashboardOverview(w http.ResponseWriter, r *http.Request, auth AuthContext) {
+	if r.Method != http.MethodGet {
+		writeError(w, http.StatusMethodNotAllowed, "method not allowed")
+		return
+	}
+	resp, errOverview := s.service.AdminDashboardOverview(r.Context(), auth.User)
+	if errOverview != nil {
+		s.writeServiceError(w, errOverview, "failed to load admin dashboard overview")
+		return
+	}
+	writeJSON(w, http.StatusOK, resp)
+}
+
+func (s *Server) handleAdminDashboardQuotaEfficiency(w http.ResponseWriter, r *http.Request, auth AuthContext) {
+	if r.Method != http.MethodGet {
+		writeError(w, http.StatusMethodNotAllowed, "method not allowed")
+		return
+	}
+	filter, errFilter := cpadashboard.ParseQueryFilter(r)
+	if errFilter != nil {
+		writeError(w, http.StatusBadRequest, errFilter.Error())
+		return
+	}
+	resp, errReport := s.service.AdminDashboardQuotaEfficiency(r.Context(), auth.User, filter)
+	if errReport != nil {
+		s.writeServiceError(w, errReport, "failed to load admin dashboard quota efficiency")
+		return
+	}
+	writeJSON(w, http.StatusOK, resp)
+}
+
+func (s *Server) handleAdminDashboardCPAAccounts(w http.ResponseWriter, r *http.Request, auth AuthContext) {
+	if r.Method != http.MethodGet {
+		writeError(w, http.StatusMethodNotAllowed, "method not allowed")
+		return
+	}
+	cpa := strings.TrimSpace(r.URL.Query().Get("cpa_source"))
+	rows, errRows := s.service.AdminDashboardCurrentAccounts(r.Context(), auth.User, cpa)
+	if errRows != nil {
+		s.writeServiceError(w, errRows, "failed to load admin dashboard cpa accounts")
+		return
+	}
+	writeJSON(w, http.StatusOK, map[string]any{"rows": rows, "generated_at": time.Now().UTC()})
+}
+
+func (s *Server) handleAdminDashboardUsage(w http.ResponseWriter, r *http.Request, auth AuthContext) {
+	if r.Method != http.MethodGet {
+		writeError(w, http.StatusMethodNotAllowed, "method not allowed")
+		return
+	}
+	filter, errFilter := cpadashboard.ParseQueryFilter(r)
+	if errFilter != nil {
+		writeError(w, http.StatusBadRequest, errFilter.Error())
+		return
+	}
+	buckets, errBuckets := s.service.AdminDashboardUsageBuckets(r.Context(), auth.User, filter)
+	if errBuckets != nil {
+		s.writeServiceError(w, errBuckets, "failed to load admin dashboard usage")
+		return
+	}
+	writeJSON(w, http.StatusOK, map[string]any{"filter": filter, "buckets": buckets, "generated_at": time.Now().UTC()})
+}
+
+func (s *Server) handleAdminDashboardCleanupCandidates(w http.ResponseWriter, r *http.Request, auth AuthContext) {
+	if r.Method != http.MethodGet {
+		writeError(w, http.StatusMethodNotAllowed, "method not allowed")
+		return
+	}
+	cpa := strings.TrimSpace(r.URL.Query().Get("cpa_source"))
+	rows, errRows := s.service.AdminDashboardCleanupCandidates(r.Context(), auth.User, cpa)
+	if errRows != nil {
+		s.writeServiceError(w, errRows, "failed to load admin dashboard cleanup candidates")
+		return
+	}
+	writeJSON(w, http.StatusOK, map[string]any{"rows": rows, "generated_at": time.Now().UTC()})
+}
+
+func (s *Server) handleAdminDashboardFilters(w http.ResponseWriter, r *http.Request, auth AuthContext) {
+	if r.Method != http.MethodGet {
+		writeError(w, http.StatusMethodNotAllowed, "method not allowed")
+		return
+	}
+	resp, errFilters := s.service.AdminDashboardFilters(r.Context(), auth.User)
+	if errFilters != nil {
+		s.writeServiceError(w, errFilters, "failed to load admin dashboard filters")
+		return
+	}
+	writeJSON(w, http.StatusOK, resp)
 }
 
 func (s *Server) handleStatic(w http.ResponseWriter, r *http.Request) {

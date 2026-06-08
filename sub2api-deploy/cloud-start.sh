@@ -10,7 +10,6 @@ ENV_FILE="${ENV_FILE:-.env}"
 COMPOSE_FILE="${COMPOSE_FILE:-docker-compose.cloud.yml}"
 SKIP_BOOTSTRAP="${SKIP_BOOTSTRAP:-0}"
 REQUIRE_ALL="${REQUIRE_ALL:-0}"
-START_DASHBOARD="${START_DASHBOARD:-1}"
 
 if [[ ! -f "$ENV_FILE" ]]; then
   echo "Generating $ENV_FILE"
@@ -40,14 +39,6 @@ if [[ "$SKIP_BOOTSTRAP" != "1" ]]; then
     --base-url "$SUB2API_URL" \
     --env-file "$ENV_FILE" \
     --upstream-mode cloud
-fi
-
-if [[ "$START_DASHBOARD" == "1" ]]; then
-  echo "Preparing CPA dashboard read-only database role"
-  ENV_FILE="$ENV_FILE" COMPOSE_FILE="$COMPOSE_FILE" bash sub2api-deploy/create-dashboard-db-role.sh
-
-  echo "Starting CPA dashboard"
-  docker compose -f "$COMPOSE_FILE" --env-file "$ENV_FILE" up -d cpa-dashboard
 fi
 
 echo "Stack status"
