@@ -167,6 +167,49 @@ services:
       retries: 3
       start_period: 10s
 
+  portal-api:
+    build:
+      context: ./sub2api-deploy
+      dockerfile: portal-api.Dockerfile
+    container_name: portal-api
+    restart: unless-stopped
+    ports:
+      - "${PORTAL_BIND_HOST:-0.0.0.0}:${PORTAL_PORT:-18100}:18100"
+    environment:
+      TZ: "${TZ:-Asia/Shanghai}"
+      PORTAL_BIND: "0.0.0.0:18100"
+      PORTAL_PUBLIC_SUB2API_BASE_URL: "${PORTAL_PUBLIC_SUB2API_BASE_URL:?PORTAL_PUBLIC_SUB2API_BASE_URL is required}"
+      PORTAL_SESSION_SECRET: "${PORTAL_SESSION_SECRET:?PORTAL_SESSION_SECRET is required}"
+      PORTAL_SESSION_TTL_HOURS: "${PORTAL_SESSION_TTL_HOURS:-24}"
+      PORTAL_COOKIE_SECURE: "${PORTAL_COOKIE_SECURE:-false}"
+      PORTAL_ALLOWED_ORIGINS: "${PORTAL_ALLOWED_ORIGINS:-}"
+      PORTAL_BOOTSTRAP_ADMIN_EMAIL: "${PORTAL_BOOTSTRAP_ADMIN_EMAIL:-}"
+      PORTAL_BOOTSTRAP_ADMIN_PASSWORD: "${PORTAL_BOOTSTRAP_ADMIN_PASSWORD:-}"
+      PORTAL_DATABASE_HOST: "sub2api-postgres"
+      PORTAL_DATABASE_PORT: "5432"
+      PORTAL_DATABASE_USER: "${POSTGRES_USER:-sub2api}"
+      PORTAL_DATABASE_PASSWORD: "${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}"
+      PORTAL_DATABASE_NAME: "${POSTGRES_DB:-sub2api}"
+      PORTAL_DATABASE_SSLMODE: "disable"
+      SUB2API_BASE_URL: "http://sub2api:8080"
+      SUB2API_ADMIN_EMAIL: "${PORTAL_SUB2API_ADMIN_EMAIL:?PORTAL_SUB2API_ADMIN_EMAIL is required}"
+      SUB2API_ADMIN_PASSWORD: "${PORTAL_SUB2API_ADMIN_PASSWORD:?PORTAL_SUB2API_ADMIN_PASSWORD is required}"
+      SUB2API_DEFAULT_GROUP_NAME: "${PORTAL_SUB2API_DEFAULT_GROUP_NAME:-cpa-openai}"
+      SUB2API_DEFAULT_KEY_QUOTA: "${PORTAL_SUB2API_DEFAULT_KEY_QUOTA:-0}"
+    depends_on:
+      sub2api-postgres:
+        condition: service_healthy
+      sub2api:
+        condition: service_healthy
+    networks:
+      - cpa-network
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-T", "5", "-O", "/dev/null", "http://localhost:18100/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
   sub2api-postgres:
     image: postgres:18-alpine
     container_name: sub2api-postgres

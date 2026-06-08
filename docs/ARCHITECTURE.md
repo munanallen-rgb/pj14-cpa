@@ -9,6 +9,7 @@ The architecture should stay pragmatic: extend existing modules first and add ne
 - `cmd/server/`: process startup, CLI flags, server wiring.
 - `cmd/cpa_dashboard/`: standalone read-only dashboard process for CPA quota efficiency and Sub2API usage views.
 - `cmd/quota_collector/`: standalone CPA quota collection process for cloud deployments.
+- `cmd/portal_api/`: standalone user Portal API for the PJ14 customer MVP.
 - `internal/api/`: Gin server, protocol multiplexing, request middleware, management endpoints, module registration.
 - `internal/api/modules/amp/`: Amp-specific route support and proxy behavior.
 - `internal/auth/`: provider OAuth/token acquisition and auth file handling.
@@ -23,6 +24,7 @@ The architecture should stay pragmatic: extend existing modules first and add ne
 - `internal/cache/`: request signature caching.
 - `internal/cpa_dashboard/`: dashboard config, Postgres reads, quota efficiency calculations, HTTP routes, and embedded static assets.
 - `internal/quota_collector/`: collector config, scheduling, CPA management report fetches, quota parsing, and Postgres writes.
+- `internal/portal/`: user registration/login, Portal schema migrations, Sub2API user/key adapter, scoped usage reads, manual recharge orders, ledger entries, and embedded MVP static UI.
 - `internal/wsrelay/`: WebSocket relay lifecycle.
 - `internal/tui/`: terminal UI.
 - `sdk/`: embeddable public-facing API, auth, config, translation, logging, and access packages.
@@ -38,6 +40,15 @@ The architecture should stay pragmatic: extend existing modules first and add ne
 7. Stream, non-stream, or WebSocket response is returned to the client.
 8. Logging, cache, usage, watcher, or management side effects occur through their owning packages.
 
+## User Portal MVP Flow
+1. Browser calls the standalone Portal API.
+2. Portal authenticates users with its own session cookie and stores user state under the `portal` Postgres schema.
+3. Portal maps each Portal user to a Sub2API user through a server-side adapter.
+4. Portal creates Sub2API API keys as the mapped Sub2API user, then stores only the Sub2API key id and a preview.
+5. End-user inference traffic goes directly to Sub2API `/v1`, not through Portal.
+6. Portal reads Sub2API `public.usage_logs` only for mapped key ids.
+7. Admin-confirmed recharge orders create immutable Portal ledger entries and call Sub2API to add balance.
+
 ## Boundaries
 - API handlers should not own provider-specific upstream details; delegate to executors, translators, auth, config, or registry packages.
 - Executors should not become general utility containers. Put shared executor support in `internal/runtime/executor/helps/`.
@@ -50,6 +61,7 @@ The architecture should stay pragmatic: extend existing modules first and add ne
 - Do not make management handlers mutate low-level storage or auth details without using the existing owning package patterns.
 - Do not make watcher/diff code depend on API handler internals.
 - Do not make TUI code the source of behavior used by non-TUI paths.
+- Do not expose Sub2API admin credentials or CPA management credentials through Portal frontend routes.
 
 ## Future Extension Points
 - New provider auth: add under `internal/auth/<provider>` and SDK auth only when needed.

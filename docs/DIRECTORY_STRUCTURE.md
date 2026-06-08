@@ -44,6 +44,7 @@ The cloud deployment path remains `/opt/cpa-sub2api`. First-stage deployments co
 - `cmd/`: executable entrypoints and small command utilities.
 - `cmd/quota_collector/`: cloud quota collector entrypoint for recording CPA auth quota snapshots.
 - `cmd/cpa_dashboard/`: cloud dashboard entrypoint for viewing CPA quota efficiency and Sub2API usage.
+- `cmd/portal_api/`: user-facing Portal API entrypoint for the PJ14 MVP.
 - `docs/`: engineering, SDK, and project documentation.
 - `examples/`: runnable examples for SDK or provider usage.
 - `internal/`: private application packages.
@@ -57,6 +58,7 @@ The cloud deployment path remains `/opt/cpa-sub2api`. First-stage deployments co
 - `internal/watcher/`: config hot reload and diff/synthesis logic.
 - `internal/quota_collector/`: CPA quota collector configuration, scheduling, report parsing, and Postgres persistence.
 - `internal/cpa_dashboard/`: read-only CPA dashboard configuration, report queries, quota efficiency metrics, HTTP routes, and embedded static UI.
+- `internal/portal/`: Portal configuration, schema migrations, user/session logic, Sub2API adapter, user-scoped usage queries, manual recharge ledger, and embedded MVP static UI.
 - `sdk/`: public embeddable packages.
 - `sub2api-deploy/`: deployment helper scripts and runbooks.
 - `test/`: cross-module integration tests.
@@ -74,6 +76,7 @@ The cloud deployment path remains `/opt/cpa-sub2api`. First-stage deployments co
 - New integration test: `test/`.
 - New package test: same package as the code under test with `_test.go`.
 - New docs: `docs/`, unless updating language-specific root README files.
+- New PJ14 cloud deployment runbooks: `sub2api-deploy/` when they directly describe the CPA + Sub2API cloud bundle.
 
 ## Directory Creation Rules
 - Before creating a directory, search for an equivalent existing directory.

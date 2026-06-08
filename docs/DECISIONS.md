@@ -41,3 +41,13 @@ This file records important engineering decisions, architecture decisions, techn
 - Reason: A separate service keeps dashboard iteration independent from request proxying and quota collection, avoids adding a frontend build toolchain, and preserves the existing single-Postgres deployment model.
 - Impact: Cloud bundles now include a dashboard binary, Dockerfile, compose service, environment variables, and a runbook for creating the read-only database role.
 - Follow-up: Request-level attribution from Sub2API usage to internal CPA auth emails remains out of scope until the proxy/usage pipeline records that relationship.
+
+## DEC-0005: Add a Decoupled Portal API for the User MVP
+
+- Date: 2026-06-08
+- Status: Accepted
+- Background: PJ14 needs a user-facing minimum closed loop for registration/login, Sub2API user mapping, API key creation, usage/cost display, manual recharge confirmation, Portal ledger entries, and Sub2API balance updates. The frontend can remain simple, but the product boundary should not be Sub2API's own admin frontend because future membership work may move to Supabase or another identity/data layer.
+- Decision: Add a standalone Go `portal-api` command and `internal/portal` package. Store Portal-owned product state in a dedicated `portal` schema inside the existing Sub2API Postgres database for the MVP. Use a Sub2API adapter for user/key/balance operations, while end-user inference traffic continues to call Sub2API `/v1` directly.
+- Reason: This keeps Sub2API as the execution gateway while making Portal the product boundary. It avoids adding a new runtime stack or database now, and preserves a clear migration path for future Supabase-based membership features.
+- Impact: Cloud deployments include a new `portal-api` service, Dockerfile, environment variables, bundle export support, Portal schema migrations, and an embedded minimal control panel.
+- Follow-up: Future work can replace Portal's identity, billing, or usage providers without changing the user-facing frontend contract.

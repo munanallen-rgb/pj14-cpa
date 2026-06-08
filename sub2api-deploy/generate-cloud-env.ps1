@@ -44,6 +44,11 @@ $jwtSecret = New-RandomHex -ByteCount 32
 $totpKey = New-RandomHex -ByteCount 32
 $dashboardPassword = New-RandomHex -ByteCount 32
 $dashboardDBPassword = New-RandomHex -ByteCount 32
+$portalSessionSecret = New-RandomHex -ByteCount 32
+$portalAdminEmail = "portal-admin@sub2api.local"
+$portalAdminPassword = New-RandomHex -ByteCount 32
+$portalSub2APIAdminEmail = "portal-service@sub2api.local"
+$portalSub2APIAdminPassword = New-RandomHex -ByteCount 32
 
 $content = @"
 SUB2API_BIND_HOST=$BindHost
@@ -68,6 +73,20 @@ CPA_DASHBOARD_LOGIN_PASSWORD=$dashboardPassword
 CPA_DASHBOARD_DATABASE_USER=sub2api_dashboard
 CPA_DASHBOARD_DATABASE_PASSWORD=$dashboardDBPassword
 
+PORTAL_BIND_HOST=0.0.0.0
+PORTAL_PORT=18100
+PORTAL_PUBLIC_SUB2API_BASE_URL=http://<server-ip>:$Port
+PORTAL_SESSION_SECRET=$portalSessionSecret
+PORTAL_SESSION_TTL_HOURS=24
+PORTAL_COOKIE_SECURE=false
+PORTAL_ALLOWED_ORIGINS=
+PORTAL_BOOTSTRAP_ADMIN_EMAIL=$portalAdminEmail
+PORTAL_BOOTSTRAP_ADMIN_PASSWORD=$portalAdminPassword
+PORTAL_SUB2API_ADMIN_EMAIL=$portalSub2APIAdminEmail
+PORTAL_SUB2API_ADMIN_PASSWORD=$portalSub2APIAdminPassword
+PORTAL_SUB2API_DEFAULT_GROUP_NAME=cpa-openai
+PORTAL_SUB2API_DEFAULT_KEY_QUOTA=0
+
 SECURITY_URL_ALLOWLIST_ENABLED=false
 SECURITY_URL_ALLOWLIST_ALLOW_INSECURE_HTTP=true
 SECURITY_URL_ALLOWLIST_ALLOW_PRIVATE_HOSTS=true
@@ -88,3 +107,10 @@ Write-Host "CPA dashboard:"
 Write-Host "  url:      http://<server-ip>:18090"
 Write-Host "  password: $dashboardPassword"
 Write-Host "  db user:  sub2api_dashboard"
+Write-Host ""
+Write-Host "Portal API:"
+Write-Host "  url:      http://<server-ip>:18100"
+Write-Host "  email:    $portalAdminEmail"
+Write-Host "  password: $portalAdminPassword"
+Write-Host "  sub2api service email:    $portalSub2APIAdminEmail"
+Write-Host "  sub2api service password: $portalSub2APIAdminPassword"

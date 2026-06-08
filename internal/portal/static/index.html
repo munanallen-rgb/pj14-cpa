@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>CLIProxy Console</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div id="authPanel" class="auth-page">
+      <section class="auth-brand">
+        <div class="brand-mark">C</div>
+        <div>
+          <h1>CLIProxy Console</h1>
+          <p>API 控制台</p>
+        </div>
+      </section>
+      <section class="auth-grid">
+        <form id="loginForm" class="auth-box">
+          <div class="section-title">
+            <span>登录</span>
+            <strong>继续管理 API 与账单</strong>
+          </div>
+          <label>
+            邮箱
+            <input id="loginEmail" type="email" autocomplete="email" placeholder="name@example.com" />
+          </label>
+          <label>
+            密码
+            <input id="loginPassword" type="password" autocomplete="current-password" placeholder="请输入密码" />
+          </label>
+          <button id="loginButton" class="primary" type="submit">登录控制台</button>
+        </form>
+        <form id="registerForm" class="auth-box">
+          <div class="section-title">
+            <span>注册</span>
+            <strong>创建新的控制台账号</strong>
+          </div>
+          <label>
+            邮箱
+            <input id="registerEmail" type="email" autocomplete="email" placeholder="name@example.com" />
+          </label>
+          <label>
+            密码
+            <input id="registerPassword" type="password" autocomplete="new-password" placeholder="至少 8 位字符" />
+          </label>
+          <button id="registerButton" class="secondary" type="submit">创建账号</button>
+        </form>
+      </section>
+      <p id="authNotice" class="notice"></p>
+    </div>
+
+    <main id="appPanel" class="app-shell hidden">
+      <aside class="sidebar">
+        <div class="brand">
+          <div class="brand-mark">C</div>
+          <div>
+            <h1>CLIProxy</h1>
+            <p>API Console</p>
+          </div>
+        </div>
+        <nav id="navRoot" class="nav-list"></nav>
+        <div class="sidebar-footer">
+          <button id="logoutButton" class="ghost" type="button">退出登录</button>
+        </div>
+      </aside>
+
+      <section class="workspace">
+        <header class="topbar">
+          <div>
+            <h2 id="viewTitle">控制台</h2>
+            <p id="viewSubtitle"></p>
+          </div>
+          <div class="top-actions">
+            <button id="refreshButton" class="icon-button" type="button" title="刷新">刷新</button>
+            <div id="userBadge" class="user-badge"></div>
+          </div>
+        </header>
+        <p id="notice" class="notice"></p>
+        <section id="viewRoot" class="view-root"></section>
+      </section>
+    </main>
+    <script src="/app.js"></script>
+  </body>
+</html>
