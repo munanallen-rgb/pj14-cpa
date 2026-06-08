@@ -96,6 +96,7 @@ http://<server-ip>:18100
 - `GET /api/me`
 - `GET /api/api-keys`
 - `POST /api/api-keys`
+- `GET /api/api-keys/{id}/secret`
 - `GET /api/usage/summary`
 - `GET /api/usage/records`
 - `POST /api/recharge-orders`
@@ -111,4 +112,4 @@ http://<server-ip>:18100
 - `GET /api/admin/cpa-dashboard/cleanup-candidates`
 - `GET /api/admin/cpa-dashboard/filters`
 
-The full API key is returned only once from `POST /api/api-keys`; Portal stores only the Sub2API key id and a preview string.
+The full API key is returned from `POST /api/api-keys` and can also be copied later through `GET /api/api-keys/{id}/secret`. Portal still stores only the Sub2API key id and a preview string; the later copy path retrieves the key on demand from Sub2API for the authenticated owner.

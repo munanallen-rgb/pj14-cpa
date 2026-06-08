@@ -30,6 +30,7 @@ Format:
 - Added cloud Docker Compose wiring, environment template entries, bundle export support, Dockerfile, and Portal runbook for the `portal-api` service.
 - Added Portal tests for configuration loading, internal Sub2API password derivation, key previewing, Sub2API user/key creation, and balance updates.
 - Added Portal admin dashboard authorization coverage.
+- Added an authenticated Portal API key secret endpoint and copy buttons so users can copy existing API keys after creation without storing full keys in Portal-owned tables.
 
 ### Changed
 - Documented the Portal architecture, directory responsibilities, and decision to keep Portal as a decoupled product boundary backed by the existing Sub2API Postgres database for the MVP.

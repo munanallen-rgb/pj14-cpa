@@ -321,6 +321,31 @@ ORDER BY created_at DESC`, userID)
 	return items, nil
 }
 
+func (s *Store) GetAPIKey(ctx context.Context, userID int64, keyID int64) (APIKey, error) {
+	var item APIKey
+	errQuery := s.pool.QueryRow(ctx, `
+SELECT id, portal_user_id, sub2api_key_id, name, key_preview, group_name, status, created_at
+FROM portal.api_keys
+WHERE portal_user_id = $1
+  AND id = $2`, userID, keyID).Scan(
+		&item.ID,
+		&item.PortalUserID,
+		&item.Sub2APIKeyID,
+		&item.Name,
+		&item.KeyPreview,
+		&item.GroupName,
+		&item.Status,
+		&item.CreatedAt,
+	)
+	if errQuery != nil {
+		if errors.Is(errQuery, pgx.ErrNoRows) {
+			return APIKey{}, ErrNotFound
+		}
+		return APIKey{}, fmt.Errorf("portal postgres: get api key: %w", errQuery)
+	}
+	return item, nil
+}
+
 func (s *Store) UsageSummary(ctx context.Context, userID int64, filter UsageFilter) (UsageSummary, error) {
 	var out UsageSummary
 	errQuery := s.pool.QueryRow(ctx, `

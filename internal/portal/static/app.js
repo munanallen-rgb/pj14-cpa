@@ -246,6 +246,7 @@ async function renderDashboard() {
     ${renderRecentKeys(keys.items)}
   `;
   bindCopyButtons();
+  bindRevealKeyButtons();
   bindJumpButtons();
 }
 
@@ -258,11 +259,12 @@ function renderRecentKeys(items) {
       <div class="table-header">
         <h3>最近的 API Key</h3>
       </div>
-      ${table(['名称', '预览', '状态', '创建时间'], items.slice(0, 5).map((item) => [
+      ${table(['名称', '预览', '状态', '创建时间', '操作'], items.slice(0, 5).map((item) => [
         item.name,
         item.key_preview,
         statusPill(item.status),
         time(item.created_at),
+        keyCopyAction(item),
       ]))}
     </section>
   `;
@@ -281,8 +283,8 @@ async function renderKeys() {
     ${state.revealedKey ? `
       <section class="panel accent-panel">
         <div class="section-title">
-          <span>请立即保存</span>
-          <strong>完整密钥只展示一次</strong>
+          <span>完整密钥</span>
+          <strong>已创建，可随时在列表复制</strong>
         </div>
         <div class="code-row">
           <code>${esc(state.revealedKey)}</code>
@@ -294,11 +296,12 @@ async function renderKeys() {
       <div class="table-header">
         <h3>API Key</h3>
       </div>
-      ${data.items.length ? table(['名称', '预览', '状态', '创建时间'], data.items.map((item) => [
+      ${data.items.length ? table(['名称', '预览', '状态', '创建时间', '操作'], data.items.map((item) => [
         item.name,
         item.key_preview,
         statusPill(item.status),
         time(item.created_at),
+        keyCopyAction(item),
       ])) : emptyState('暂无 API Key', '创建密钥后即可开始调用 API。')}
     </section>
   `;
@@ -310,12 +313,13 @@ async function renderKeys() {
       });
       state.revealedKey = created.key;
       await renderKeys();
-      setNotice('API Key 已创建，请立即复制保存。');
+      setNotice('API Key 已创建，可直接复制使用，也可稍后在列表复制。');
     } catch (err) {
       setNotice(err.message);
     }
   };
   bindCopyButtons();
+  bindRevealKeyButtons();
 }
 
 async function renderUsage() {
@@ -753,6 +757,12 @@ function adminOrderActions(item) {
   `);
 }
 
+function keyCopyAction(item) {
+  return raw(`
+    <button class="icon-button small" data-copy-key="${esc(item.id)}" type="button">复制</button>
+  `);
+}
+
 function capacityToolbar(filters) {
   return `
     <section class="toolbar capacity-toolbar">
@@ -933,6 +943,27 @@ function bindCopyButtons() {
       const text = button.dataset.copy;
       await copyText(text);
       setNotice('已复制到剪贴板。');
+    };
+  });
+}
+
+function bindRevealKeyButtons() {
+  document.querySelectorAll('[data-copy-key]').forEach((button) => {
+    button.onclick = async () => {
+      const originalText = button.textContent;
+      button.disabled = true;
+      button.textContent = '复制中';
+      try {
+        const data = await api(`/api/api-keys/${encodeURIComponent(button.dataset.copyKey)}/secret`);
+        if (!data.key) throw new Error('API Key 不可用');
+        await copyText(data.key);
+        setNotice('API Key 已复制到剪贴板。');
+      } catch (err) {
+        setNotice(err.message);
+      } finally {
+        button.disabled = false;
+        button.textContent = originalText;
+      }
     };
   });
 }

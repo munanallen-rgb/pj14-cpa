@@ -40,6 +40,7 @@ func (s *Server) Handler() http.Handler {
 	mux.HandleFunc("/api/auth/logout", s.withUser(s.handleLogout))
 	mux.HandleFunc("/api/me", s.withUser(s.handleMe))
 	mux.HandleFunc("/api/api-keys", s.withUser(s.handleAPIKeys))
+	mux.HandleFunc("/api/api-keys/", s.withUser(s.handleAPIKeyAction))
 	mux.HandleFunc("/api/usage/summary", s.withUser(s.handleUsageSummary))
 	mux.HandleFunc("/api/usage/records", s.withUser(s.handleUsageRecords))
 	mux.HandleFunc("/api/recharge-orders", s.withUser(s.handleRechargeOrders))
@@ -148,6 +149,24 @@ func (s *Server) handleAPIKeys(w http.ResponseWriter, r *http.Request, auth Auth
 	default:
 		writeError(w, http.StatusMethodNotAllowed, "method not allowed")
 	}
+}
+
+func (s *Server) handleAPIKeyAction(w http.ResponseWriter, r *http.Request, auth AuthContext) {
+	if r.Method != http.MethodGet {
+		writeError(w, http.StatusMethodNotAllowed, "method not allowed")
+		return
+	}
+	keyID, action, errParse := parseAPIKeyAction(r.URL.Path)
+	if errParse != nil || action != "secret" {
+		writeError(w, http.StatusNotFound, "not found")
+		return
+	}
+	key, errSecret := s.service.APIKeySecret(r.Context(), auth.User, keyID)
+	if errSecret != nil {
+		s.writeServiceError(w, errSecret, "failed to load api key")
+		return
+	}
+	writeJSON(w, http.StatusOK, map[string]string{"key": key})
 }
 
 func (s *Server) handleUsageSummary(w http.ResponseWriter, r *http.Request, auth AuthContext) {
@@ -517,6 +536,19 @@ func parseOptionalInt64(raw string) (int64, error) {
 
 func parseAdminRechargeAction(path string) (int64, string, error) {
 	rest := strings.TrimPrefix(path, "/api/admin/recharge-orders/")
+	parts := strings.Split(strings.Trim(rest, "/"), "/")
+	if len(parts) != 2 {
+		return 0, "", fmt.Errorf("invalid path")
+	}
+	id, errID := strconv.ParseInt(parts[0], 10, 64)
+	if errID != nil || id <= 0 {
+		return 0, "", fmt.Errorf("invalid id")
+	}
+	return id, parts[1], nil
+}
+
+func parseAPIKeyAction(path string) (int64, string, error) {
+	rest := strings.TrimPrefix(path, "/api/api-keys/")
 	parts := strings.Split(strings.Trim(rest, "/"), "/")
 	if len(parts) != 2 {
 		return 0, "", fmt.Errorf("invalid path")

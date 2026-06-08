@@ -50,6 +50,15 @@ func (f *fakeSub2API) CreateAPIKey(_ context.Context, email string, _ string, na
 	return key, nil
 }
 
+func (f *fakeSub2API) GetAPIKey(_ context.Context, _ string, _ string, keyID int64) (Sub2APIKey, error) {
+	for _, key := range f.keys {
+		if key.ID == keyID {
+			return key, nil
+		}
+	}
+	return Sub2APIKey{}, ErrNotFound
+}
+
 func (f *fakeSub2API) AddBalance(_ context.Context, userID int64, amount float64, _ string) (Sub2APIUser, error) {
 	f.balances[userID] += amount
 	return Sub2APIUser{ID: userID, Email: "user@example.com", Balance: f.balances[userID]}, nil
@@ -112,6 +121,13 @@ func TestPortalMVPFlowWithPostgres(t *testing.T) {
 	}
 	if key.Key == "" || key.Sub2APIKeyID == 0 {
 		t.Fatalf("created key missing values: %#v", key)
+	}
+	secret, errSecret := service.APIKeySecret(ctx, user, key.ID)
+	if errSecret != nil {
+		t.Fatalf("api key secret: %v", errSecret)
+	}
+	if secret != key.Key {
+		t.Fatalf("api key secret = %q, want %q", secret, key.Key)
 	}
 
 	_, errUsage := pool.Exec(ctx, `

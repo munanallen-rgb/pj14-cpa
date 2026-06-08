@@ -21,6 +21,7 @@ const (
 type Sub2API interface {
 	EnsureUser(ctx context.Context, email string, password string) (Sub2APIUser, error)
 	CreateAPIKey(ctx context.Context, email string, password string, name string) (Sub2APIKey, error)
+	GetAPIKey(ctx context.Context, email string, password string, keyID int64) (Sub2APIKey, error)
 	AddBalance(ctx context.Context, userID int64, amount float64, note string) (Sub2APIUser, error)
 }
 
@@ -110,6 +111,27 @@ func (c *Sub2APIClient) CreateAPIKey(ctx context.Context, email string, password
 	return key, nil
 }
 
+// GetAPIKey retrieves a user's existing Sub2API key for copy-on-demand behavior.
+func (c *Sub2APIClient) GetAPIKey(ctx context.Context, email string, password string, keyID int64) (Sub2APIKey, error) {
+	userToken, errUser := c.login(ctx, email, password)
+	if errUser != nil {
+		return Sub2APIKey{}, errUser
+	}
+	keys, errKeys := c.listAPIKeys(ctx, userToken)
+	if errKeys != nil {
+		return Sub2APIKey{}, errKeys
+	}
+	for _, key := range keys {
+		if key.ID == keyID {
+			if strings.TrimSpace(key.Key) == "" {
+				return Sub2APIKey{}, ErrNotFound
+			}
+			return key, nil
+		}
+	}
+	return Sub2APIKey{}, ErrNotFound
+}
+
 // AddBalance applies a manual top-up to a Sub2API user.
 func (c *Sub2APIClient) AddBalance(ctx context.Context, userID int64, amount float64, note string) (Sub2APIUser, error) {
 	adminToken, errLogin := c.login(ctx, c.cfg.AdminEmail, c.cfg.AdminPassword)
@@ -183,6 +205,14 @@ func (c *Sub2APIClient) listUsers(ctx context.Context, token string) ([]Sub2APIU
 		return nil, fmt.Errorf("sub2api: list users: %w", errRequest)
 	}
 	return users, nil
+}
+
+func (c *Sub2APIClient) listAPIKeys(ctx context.Context, token string) ([]Sub2APIKey, error) {
+	var keys []Sub2APIKey
+	if errRequest := c.requestList(ctx, http.MethodGet, "/api/v1/keys", token, nil, &keys); errRequest != nil {
+		return nil, fmt.Errorf("sub2api: list api keys: %w", errRequest)
+	}
+	return keys, nil
 }
 
 func (c *Sub2APIClient) createUser(ctx context.Context, token string, email string, password string, groupID int64) (Sub2APIUser, error) {

@@ -154,6 +154,29 @@ func (s *Service) CreateAPIKey(ctx context.Context, user User, name string) (API
 	return APIKeyCreateResult{APIKey: item, Key: key.Key}, nil
 }
 
+func (s *Service) APIKeySecret(ctx context.Context, user User, keyID int64) (string, error) {
+	if keyID <= 0 {
+		return "", fmt.Errorf("%w: invalid api key id", ErrInvalidInput)
+	}
+	item, errItem := s.store.GetAPIKey(ctx, user.ID, keyID)
+	if errItem != nil {
+		return "", errItem
+	}
+	mapping, errEnsure := s.ensureSub2APIUser(ctx, user)
+	if errEnsure != nil {
+		return "", errEnsure
+	}
+	password := deriveSub2APIPassword(s.cfg.SessionSecret, user.ID)
+	key, errKey := s.sub2api.GetAPIKey(ctx, mapping.Sub2APIEmail, password, item.Sub2APIKeyID)
+	if errKey != nil {
+		return "", errKey
+	}
+	if strings.TrimSpace(key.Key) == "" {
+		return "", ErrNotFound
+	}
+	return key.Key, nil
+}
+
 func (s *Service) UsageSummary(ctx context.Context, user User, filter UsageFilter) (UsageSummary, error) {
 	filter = normalizeUsageFilter(filter, s.now())
 	return s.store.UsageSummary(ctx, user.ID, filter)

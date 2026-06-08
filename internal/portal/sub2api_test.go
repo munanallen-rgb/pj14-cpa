@@ -2,6 +2,7 @@ package portal
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -62,6 +63,11 @@ func TestSub2APIClientEnsureUserAndCreateAPIKey(t *testing.T) {
 				t.Fatalf("decode create key body: %v", err)
 			}
 			_, _ = w.Write([]byte(`{"data":{"id":99,"key":"sk-created","name":"Portal key","group_id":7,"status":"active"}}`))
+		case r.Method == http.MethodGet && r.URL.Path == "/api/v1/keys":
+			if r.Header.Get("Authorization") != "Bearer user-token" {
+				t.Fatalf("key list authorization = %q", r.Header.Get("Authorization"))
+			}
+			_, _ = w.Write([]byte(`{"data":{"items":[{"id":99,"key":"sk-created","name":"Portal key","group_id":7,"status":"active"}]}}`))
 		default:
 			http.NotFound(w, r)
 		}
@@ -103,6 +109,17 @@ func TestSub2APIClientEnsureUserAndCreateAPIKey(t *testing.T) {
 	}
 	if createdKeyBody["quota"].(float64) != 10 {
 		t.Fatalf("created key quota = %v, want 10", createdKeyBody["quota"])
+	}
+
+	existingKey, errExistingKey := client.GetAPIKey(t.Context(), "user@example.com", "sub2api-password", 99)
+	if errExistingKey != nil {
+		t.Fatalf("GetAPIKey returned error: %v", errExistingKey)
+	}
+	if existingKey.Key != "sk-created" {
+		t.Fatalf("existing key = %#v, want sk-created", existingKey)
+	}
+	if _, errMissingKey := client.GetAPIKey(t.Context(), "user@example.com", "sub2api-password", 100); !errors.Is(errMissingKey, ErrNotFound) {
+		t.Fatalf("missing key error = %v, want ErrNotFound", errMissingKey)
 	}
 }
 
