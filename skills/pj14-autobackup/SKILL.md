@@ -17,6 +17,8 @@ Run the bundled PowerShell script from the repository root:
 powershell.exe -ExecutionPolicy Bypass -File .\skills\pj14-autobackup\scripts\backup-pj14-cloud.ps1
 ```
 
+When running from a restricted Codex sandbox, if the first attempt fails before remote archive output with an SSH error such as `ssh: connect to host 159.65.7.65 port 22: Permission denied`, immediately retry the same script with escalated execution (`sandbox_permissions: "require_escalated"`) so SSH/SCP can use the approved non-sandbox network path. Treat the first failure as an execution-environment issue unless the escalated retry also fails. After the retry, still perform the normal SHA256, `contents.txt`, required-path, and remote-cleanup validation before reporting success.
+
 Defaults:
 
 - SSH target: `root@159.65.7.65`
@@ -116,6 +118,13 @@ Current script behavior:
 - If the transfer times out, the script kills the full `scp`/child `ssh` process tree to avoid orphaned Windows OpenSSH sessions.
 - If `scp` returns a non-zero exit code after both the archive and `.sha256` files exist locally, the script continues to SHA256 validation.
 - A backup is complete only after SHA256 matches, `contents.txt` is generated, required paths are present, and remote temporary files are cleaned or a cleanup warning is reported.
+
+Codex sandbox behavior:
+
+- A pre-archive SSH error like `Permission denied` on port 22 can mean the command ran inside the restricted sandbox instead of the approved SSH/SCP path.
+- For this case, retry the same PowerShell backup command with `sandbox_permissions: "require_escalated"` and a short justification for SSH/SCP access.
+- If the escalated retry succeeds, report the successful backup and mention that the first failure was sandbox-related.
+- If the escalated retry also fails before `ARCHIVE=` output, report the SSH failure and note that no remote archive path was emitted, so remote cleanup status is unknown.
 
 Lessons from the 2026-06-06 incident:
 

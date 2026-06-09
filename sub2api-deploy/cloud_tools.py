@@ -104,6 +104,7 @@ def cmd_generate_env(args):
     values = {
         "SUB2API_BIND_HOST": args.bind_host,
         "SUB2API_PORT": str(args.port),
+        "SUB2API_IMAGE": "weishaw/sub2api:latest",
         "ADMIN_EMAIL": args.admin_email,
         "ADMIN_PASSWORD": secrets.token_hex(32),
         "POSTGRES_USER": "sub2api",

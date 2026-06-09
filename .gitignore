@@ -37,6 +37,8 @@ instances/*/logs/*
 sub2api-deploy/data/*
 sub2api-deploy/postgres_data/*
 sub2api-deploy/redis_data/*
+sub2api-deploy/quota-collector/*
+sub2api-deploy/portal-api/*
 sub2api-deploy/cookies.txt
 !sub2api-deploy/data/.gitkeep
 !sub2api-deploy/postgres_data/.gitkeep
