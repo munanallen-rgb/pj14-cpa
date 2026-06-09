@@ -26,6 +26,7 @@ Format:
 ### Added
 - Added a non-secret upgrade manifest example and local manifest writer for recording CPA/Sub2API candidate versions under `temp/`.
 - Added a local Sub2API normal-user smoke test script for upgrade validation without printing API keys.
+- Added the `pj14-upgrade-deploy` project skill to reuse the CPA/Sub2API update, local validation, backup, deployment, and cloud verification workflow.
 
 ### Changed
 - Made the Sub2API image configurable through `SUB2API_IMAGE` in local and cloud Compose files while preserving `weishaw/sub2api:latest` as the default.
