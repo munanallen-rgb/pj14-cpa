@@ -15,7 +15,7 @@ This file records important engineering decisions, architecture decisions, techn
 ## DEC-0002: Manage PJ14 as a Single Local Project Root
 
 - Date: 2026-06-02
-- Status: Accepted
+- Status: Superseded by DEC-0008
 - Background: PJ14 combines the CPA source tree, multiple CPA instance configs, Sub2API deployment assets, cloud deployment scripts, project skills, and local recovery backups. Moving CPA source into a nested directory would force broad build, Docker, and deployment path changes.
 - Decision: Keep CPA source at the repository root and manage PJ14 on the long-lived local `pj14-main` branch. Rename the official CPA remote to `cpa-official`; leave `origin` unset until a private PJ14 remote exists. Track deployment definitions, scripts, docs, skills, and CPA config files in this repository, but keep `.env`, auth JSON files, logs, backups, Sub2API runtime data, Postgres data, Redis data, cookies, and temporary output out of Git.
 - Reason: This preserves the working local and cloud deployment layout while making future project ownership and update flows clearer.
@@ -71,3 +71,13 @@ This file records important engineering decisions, architecture decisions, techn
 - Reason: This removes the public `18090` surface and its separate password gate without deleting the report queries that Portal needs.
 - Impact: Cloud deployments no longer start or expose `cpa-dashboard`. Portal remains the only dashboard UI, and its admin authorization protects the capacity reports.
 - Follow-up: A later cleanup may rename `internal/cpa_dashboard` to a more neutral report package name after Portal behavior is stable and the extra churn is worth it.
+
+## DEC-0008: Split PJ14 Into Two Source Forks and One Deploy Repository
+
+- Date: 2026-06-13
+- Status: Accepted
+- Background: PJ14 initially kept CPA source, Sub2API deployment assets, cloud scripts, instance configs, and project-specific operational skills in one CPA fork. That made first-stage deployment fast, but it mixed two upstream projects and deployment orchestration in one Git history.
+- Decision: Maintain CPA code in the `pj14-cliproxyapi` fork, Sub2API code in a separate `pj14-sub2api` fork, and cloud orchestration in a separate `pj14-deploy` repository. Keep `/opt/cpa-sub2api` runtime compatibility in exported deploy bundles so production state paths do not change.
+- Reason: This keeps upstream merges for CPA and Sub2API independent while preserving a single deployment source of truth for Compose, env templates, runbooks, and image tags.
+- Impact: PJ14 deployment assets, CPA instance configs, project operational skills, and Sub2API runtime directories are removed from the CPA source fork and owned by `pj14-deploy`. CPA source packaging assets such as `Dockerfile` and source-level Compose files remain here.
+- Follow-up: After the user creates the remote GitHub repositories for `sub2api` and `pj14-deploy`, push the local workspaces and use `pj14-deploy` as the cloud deployment source of truth.

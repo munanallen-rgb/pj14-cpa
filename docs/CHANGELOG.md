@@ -21,6 +21,24 @@ Format:
 ### Notes
 - ...
 
+## 2026-06-13
+
+### Added
+- Added a split-repository decision for PJ14: CPA source in `pj14-cliproxyapi`, Sub2API source in `pj14-sub2api`, and deployment orchestration in `pj14-deploy`.
+
+### Changed
+- Updated project overview and directory structure docs to treat this repository as the CPA source fork after deployment assets moved to `pj14-deploy`.
+- Simplified `.gitignore` now that PJ14 instance configs, deployment scripts, runtime data directories, and project operational skills are no longer tracked in this CPA source branch.
+
+### Fixed
+- Nothing.
+
+### Removed
+- Removed PJ14 deployment-only assets from the CPA source branch, including `docker-compose.cloud.yml`, tracked CPA instance configs, `sub2api-deploy/`, and PJ14 operational skills.
+
+### Notes
+- The production `/opt/cpa-sub2api` runtime shape is preserved by the separate `pj14-deploy` repository, so this source-branch cleanup does not modify running services.
+
 ## 2026-06-12
 
 ### Added

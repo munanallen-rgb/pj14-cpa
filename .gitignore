@@ -4,7 +4,7 @@ cli-proxy-api
 
 # Configuration
 .env
-!instances/*/config.yaml
+config.yaml
 
 # Generated content
 bin/*
@@ -27,22 +27,10 @@ static/*
 
 # Authentication data
 auths/*
-!auths/.gitkeep
-instances/*/auths/*
-instances/*/logs/*
-!instances/*/auths/.gitkeep
-!instances/*/logs/.gitkeep
 
-# Local Sub2API runtime data
-sub2api-deploy/data/*
-sub2api-deploy/postgres_data/*
-sub2api-deploy/redis_data/*
-sub2api-deploy/quota-collector/*
-sub2api-deploy/portal-api/*
-sub2api-deploy/cookies.txt
-!sub2api-deploy/data/.gitkeep
-!sub2api-deploy/postgres_data/.gitkeep
-!sub2api-deploy/redis_data/.gitkeep
+# PJ14 deployment repository owns these paths after the split.
+instances/
+sub2api-deploy/
 
 # Documentation
 docs/*

@@ -1,4 +1,0 @@
-interface:
-  display_name: "PJ14 Upgrade Deploy"
-  short_description: "Update, test, deploy, and verify PJ14 CPA/Sub2API."
-  default_prompt: "Use $pj14-upgrade-deploy to update CPA and Sub2API locally, test them, deploy to cloud after approval, and verify production."

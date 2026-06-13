@@ -4,7 +4,7 @@
 CLIProxyAPI.
 
 ## Goal
-Provide a local proxy server that exposes OpenAI/Gemini/Claude/Codex/Grok-compatible APIs for CLI clients and SDK users, with OAuth-based provider access, account routing, protocol translation, management APIs, and optional deployment helpers.
+Provide a local proxy server that exposes OpenAI/Gemini/Claude/Codex/Grok-compatible APIs for CLI clients and SDK users, with OAuth-based provider access, account routing, protocol translation, management APIs, and source-level packaging assets.
 
 ## Current Technology Stack
 - Language: Go `1.26.0` from `go.mod`.
@@ -15,7 +15,7 @@ Provide a local proxy server that exposes OpenAI/Gemini/Claude/Codex/Grok-compat
 - Auth/OAuth: provider-specific packages under `internal/auth/` and SDK auth packages.
 - Storage: file-based default with optional Postgres, git, object store, Redis-related queue support.
 - WebSocket: gorilla/websocket and internal wsrelay/runtime executors.
-- Packaging/deployment: Dockerfile, Docker Compose files, GoReleaser config, PowerShell and shell scripts.
+- Packaging: Dockerfile, Docker Compose files, GoReleaser config, PowerShell and shell scripts.
 - Package manager/build tool: Go modules.
 
 ## Main Functional Areas
@@ -34,7 +34,7 @@ Provide a local proxy server that exposes OpenAI/Gemini/Claude/Codex/Grok-compat
 - User Portal MVP: `internal/portal/`, backed by a dedicated `portal` schema in the existing Sub2API Postgres database, with an admin-only capacity dashboard that reuses CPA dashboard report logic.
 - Embeddable SDK: `sdk/cliproxy/` plus related SDK packages.
 - Integration and compatibility tests: `test/`.
-- Deployment helpers: `Dockerfile`, `docker-compose*.yml`, `sub2api-deploy/`.
+- Packaging helpers: `Dockerfile` and source-level `docker-compose*.yml`.
 
 ## Run
 ```bash
@@ -65,7 +65,7 @@ go test -v -run TestName ./path/to/pkg
 Run focused tests for the touched package when possible. Run `go test ./...` for broad or shared behavior changes.
 
 ## Current Project Status
-Active Go service with existing production-facing modules, SDK packages, tests, docs, Docker assets, and deployment scripts. The repository is not empty. Several future modules or changes may be undecided; record those as TBD (待确认) until a concrete design is accepted.
+Active Go service with existing production-facing modules, SDK packages, tests, docs, and Docker assets. PJ14 cloud deployment orchestration now lives in the separate `pj14-deploy` repository. The repository is not empty. Several future modules or changes may be undecided; record those as TBD (待确认) until a concrete design is accepted.
 
 ## Context New Agents Must Know
 - Root `AGENTS.md` is mandatory reading before any task.

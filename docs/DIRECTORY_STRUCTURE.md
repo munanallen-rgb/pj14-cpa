@@ -5,21 +5,15 @@
 .
 ├── .github/
 ├── assets/
-├── auths/
 ├── backups/
 ├── cmd/
 ├── docs/
 ├── examples/
-├── instances/
 ├── internal/
-├── logs/
 ├── sdk/
-├── skills/
-├── sub2api-deploy/
 ├── temp/
 ├── test/
 ├── config.example.yaml
-├── config.yaml
 ├── docker-compose*.yml
 ├── Dockerfile
 ├── go.mod
@@ -28,19 +22,20 @@
 └── AGENTS.md
 ```
 
-Some local/runtime directories such as `auths/`, `backups/`, `instances/`, `logs/`, `skills/`, and `temp/` may contain machine-specific files. Do not treat local generated content as product source unless the task explicitly targets it.
+Some local/runtime directories such as `auths/`, `backups/`, `logs/`, and `temp/` may contain machine-specific files. Do not treat local generated content as product source unless the task explicitly targets it.
 
 ## PJ14 Repository Layout
-PJ14 uses this repository root as the single local project root for the CPA source tree plus deployment assets. Do not move the CPA Go source into a nested `cpa/` directory during the first-stage cleanup; `cmd/`, `internal/`, `sdk/`, `go.mod`, `Dockerfile`, and the existing compose files stay at the root so current build and deployment scripts continue to work.
+PJ14 now uses two source forks plus one deployment repository:
 
-Track deployment definitions and reusable deployment helpers, including `docker-compose.cloud.yml`, `instances/*/config.yaml`, `sub2api-deploy/` scripts, docs, and skills. Do not track runtime secrets or generated state such as `.env`, auth JSON files, logs, `backups/`, Sub2API data, Postgres data, Redis data, cookies, or temporary output.
+- `pj14-cliproxyapi`: CPA source fork. Keep CPA source, SDK, tests, docs, and source-level packaging assets here.
+- `pj14-sub2api`: Sub2API source fork. Keep Sub2API product and billing customizations there.
+- `pj14-deploy`: PJ14 deployment repository. Keep cloud Compose, CPA instance configs, Nginx examples, env templates, runbooks, and deploy scripts there.
 
-The cloud deployment path remains `/opt/cpa-sub2api`. First-stage deployments continue to use the existing local bundle/upload workflow instead of turning the cloud directory into a Git checkout.
+The cloud deployment path remains `/opt/cpa-sub2api`, but that runtime shape is exported by `pj14-deploy`, not this CPA source repository.
 
 ## Directory Responsibilities
 - `.github/`: GitHub workflows and repository automation.
 - `assets/`: README and documentation images/assets.
-- `auths/`: default local auth material location; do not commit secrets.
 - `cmd/`: executable entrypoints and small command utilities.
 - `cmd/quota_collector/`: cloud quota collector entrypoint for recording CPA auth quota snapshots.
 - `cmd/portal_api/`: user-facing Portal API entrypoint for the PJ14 MVP.
@@ -59,7 +54,6 @@ The cloud deployment path remains `/opt/cpa-sub2api`. First-stage deployments co
 - `internal/cpa_dashboard/`: read-only capacity report queries, quota efficiency metrics, reusable report service methods, and report types used by Portal admin routes.
 - `internal/portal/`: Portal configuration, schema migrations, user/session logic, Sub2API adapter, user-scoped usage queries, manual recharge ledger, admin-only capacity dashboard routes, and embedded MVP static UI.
 - `sdk/`: public embeddable packages.
-- `sub2api-deploy/`: deployment helper scripts and runbooks.
 - `test/`: cross-module integration tests.
 
 ## Where New Files Should Go
@@ -75,7 +69,7 @@ The cloud deployment path remains `/opt/cpa-sub2api`. First-stage deployments co
 - New integration test: `test/`.
 - New package test: same package as the code under test with `_test.go`.
 - New docs: `docs/`, unless updating language-specific root README files.
-- New PJ14 cloud deployment runbooks: `sub2api-deploy/` when they directly describe the CPA + Sub2API cloud bundle.
+- New PJ14 cloud deployment runbooks: the separate `pj14-deploy` repository.
 
 ## Directory Creation Rules
 - Before creating a directory, search for an equivalent existing directory.

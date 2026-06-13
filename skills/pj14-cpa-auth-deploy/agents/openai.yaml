@@ -1,4 +1,0 @@
-interface:
-  display_name: "PJ14 CPA Auth Deploy"
-  short_description: "Deploy CPA auth JSON files to the PJ14 cloud server."
-  default_prompt: "Use $pj14-cpa-auth-deploy to deploy prepared CPA auth JSON files to cpa1, cpa2, cpa3, or all."
