@@ -27,9 +27,9 @@ Some local/runtime directories such as `auths/`, `backups/`, `logs/`, and `temp/
 ## PJ14 Repository Layout
 PJ14 now uses two source forks plus one deployment repository:
 
-- `pj14-cliproxyapi`: CPA source fork. Keep CPA source, SDK, tests, docs, and source-level packaging assets here.
+- `pj14-cpa`: CPA source fork. Keep CPA source, SDK, tests, docs, and source-level packaging assets here. Local checkout directories may still use older names, but the canonical remote and branch are `munanallen-rgb/pj14-cpa` and `pj14-cpa`.
 - `pj14-sub2api`: Sub2API source fork. Keep Sub2API product and billing customizations there.
-- `pj14-deploy`: PJ14 deployment repository. Keep cloud Compose, CPA instance configs, Nginx examples, env templates, runbooks, and deploy scripts there.
+- `pj14-deploy`: PJ14 project control and deployment repository. Keep cloud Compose, CPA instance configs, Nginx examples, env templates, runbooks, deploy scripts, image tags, and cross-repository governance docs there.
 
 The cloud deployment path remains `/opt/cpa-sub2api`, but that runtime shape is exported by `pj14-deploy`, not this CPA source repository.
 
@@ -38,7 +38,7 @@ The cloud deployment path remains `/opt/cpa-sub2api`, but that runtime shape is 
 - `assets/`: README and documentation images/assets.
 - `cmd/`: executable entrypoints and small command utilities.
 - `cmd/quota_collector/`: cloud quota collector entrypoint for recording CPA auth quota snapshots.
-- `cmd/portal_api/`: user-facing Portal API entrypoint for the PJ14 MVP.
+- `cmd/portal_api/`: legacy Portal API entrypoint. It is not the current PJ14 product surface.
 - `docs/`: engineering, SDK, and project documentation.
 - `examples/`: runnable examples for SDK or provider usage.
 - `internal/`: private application packages.
@@ -51,8 +51,8 @@ The cloud deployment path remains `/opt/cpa-sub2api`, but that runtime shape is 
 - `internal/translator/`: protocol translators.
 - `internal/watcher/`: config hot reload and diff/synthesis logic.
 - `internal/quota_collector/`: CPA quota collector configuration, scheduling, report parsing, and Postgres persistence.
-- `internal/cpa_dashboard/`: read-only capacity report queries, quota efficiency metrics, reusable report service methods, and report types used by Portal admin routes.
-- `internal/portal/`: Portal configuration, schema migrations, user/session logic, Sub2API adapter, user-scoped usage queries, manual recharge ledger, admin-only capacity dashboard routes, and embedded MVP static UI.
+- `internal/cpa_dashboard/`: read-only capacity report queries, quota efficiency metrics, reusable report service methods, and report types retained for legacy/reporting paths.
+- `internal/portal/`: legacy Portal configuration, schema migrations, user/session logic, Sub2API adapter, user-scoped usage queries, manual recharge ledger, admin-only capacity dashboard routes, and embedded MVP static UI.
 - `sdk/`: public embeddable packages.
 - `test/`: cross-module integration tests.
 

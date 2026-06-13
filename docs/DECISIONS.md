@@ -45,7 +45,8 @@ This file records important engineering decisions, architecture decisions, techn
 ## DEC-0005: Add a Decoupled Portal API for the User MVP
 
 - Date: 2026-06-08
-- Status: Accepted
+- Status: Superseded by DEC-0009
+- Superseded note: Portal is retained only as legacy source unless the user explicitly asks for Portal work. Current PJ14 user/admin product operations happen in Sub2API.
 - Background: PJ14 needs a user-facing minimum closed loop for registration/login, Sub2API user mapping, API key creation, usage/cost display, manual recharge confirmation, Portal ledger entries, and Sub2API balance updates. The frontend can remain simple, but the product boundary should not be Sub2API's own admin frontend because future membership work may move to Supabase or another identity/data layer.
 - Decision: Add a standalone Go `portal-api` command and `internal/portal` package. Store Portal-owned product state in a dedicated `portal` schema inside the existing Sub2API Postgres database for the MVP. Use a Sub2API adapter for user/key/balance operations, while end-user inference traffic continues to call Sub2API `/v1` directly.
 - Reason: This keeps Sub2API as the execution gateway while making Portal the product boundary. It avoids adding a new runtime stack or database now, and preserves a clear migration path for future Supabase-based membership features.
@@ -65,11 +66,12 @@ This file records important engineering decisions, architecture decisions, techn
 ## DEC-0007: Retire the Standalone `18090` CPA Dashboard
 
 - Date: 2026-06-08
-- Status: Accepted
+- Status: Superseded by DEC-0009
+- Superseded note: Portal is no longer the current PJ14 dashboard or product surface. Keep report code only where it remains useful to current CPA/Sub2API operations.
 - Background: The Portal admin capacity dashboard has been validated as the supported operator surface for quota efficiency, account health, usage trend, and cleanup-candidate reports.
 - Decision: Remove the standalone `cpa-dashboard` command, embedded standalone frontend, Dockerfile, Compose service, dashboard runbook, generated environment variables, bundle export build step, and dashboard-specific read-only role setup script. Keep `internal/cpa_dashboard` as the reusable report package used by Portal admin routes.
 - Reason: This removes the public `18090` surface and its separate password gate without deleting the report queries that Portal needs.
-- Impact: Cloud deployments no longer start or expose `cpa-dashboard`. Portal remains the only dashboard UI, and its admin authorization protects the capacity reports.
+- Impact: At that historical stage, cloud deployments no longer started or exposed `cpa-dashboard`, and Portal carried the dashboard UI. DEC-0009 supersedes that product-surface decision.
 - Follow-up: A later cleanup may rename `internal/cpa_dashboard` to a more neutral report package name after Portal behavior is stable and the extra churn is worth it.
 
 ## DEC-0008: Split PJ14 Into Two Source Forks and One Deploy Repository
@@ -77,7 +79,17 @@ This file records important engineering decisions, architecture decisions, techn
 - Date: 2026-06-13
 - Status: Accepted
 - Background: PJ14 initially kept CPA source, Sub2API deployment assets, cloud scripts, instance configs, and project-specific operational skills in one CPA fork. That made first-stage deployment fast, but it mixed two upstream projects and deployment orchestration in one Git history.
-- Decision: Maintain CPA code in the `pj14-cliproxyapi` fork, Sub2API code in a separate `pj14-sub2api` fork, and cloud orchestration in a separate `pj14-deploy` repository. Keep `/opt/cpa-sub2api` runtime compatibility in exported deploy bundles so production state paths do not change.
+- Decision: Maintain CPA code in the `pj14-cpa` fork, Sub2API code in a separate `pj14-sub2api` fork, and cloud orchestration in a separate `pj14-deploy` repository. Keep `/opt/cpa-sub2api` runtime compatibility in exported deploy bundles so production state paths do not change.
 - Reason: This keeps upstream merges for CPA and Sub2API independent while preserving a single deployment source of truth for Compose, env templates, runbooks, and image tags.
 - Impact: PJ14 deployment assets, CPA instance configs, project operational skills, and Sub2API runtime directories are removed from the CPA source fork and owned by `pj14-deploy`. CPA source packaging assets such as `Dockerfile` and source-level Compose files remain here.
-- Follow-up: After the user creates the remote GitHub repositories for `sub2api` and `pj14-deploy`, push the local workspaces and use `pj14-deploy` as the cloud deployment source of truth.
+- Follow-up: Completed. The target repositories are `munanallen-rgb/pj14-cpa`, `munanallen-rgb/pj14-sub2api`, and `munanallen-rgb/pj14-deploy`.
+
+## DEC-0009: Use Sub2API as the PJ14 Product Surface and `pj14-deploy` as the Project Control Repository
+
+- Date: 2026-06-13
+- Status: Accepted
+- Background: After validating the split-repository workflow, PJ14 no longer uses the custom Portal as the active user/admin surface. Product operations now happen in Sub2API, while deployment and cross-repository coordination need a stable entrypoint that is independent of either source fork.
+- Decision: Treat `pj14-deploy` as the PJ14 project control repository and deployment source of truth. Keep CPA source changes in `pj14-cpa`, Sub2API product changes in `pj14-sub2api`, and all deployment orchestration plus cross-repository governance in `pj14-deploy`. Treat Portal code in this CPA fork as legacy unless the user explicitly asks to revive or modify it.
+- Reason: This gives future agents a clear default: synchronize official CPA and Sub2API upstreams into their own forks, build/publish images from those forks, then deploy from `pj14-deploy`. It also prevents new work from drifting back into the retired Portal path.
+- Impact: Agent instructions must point PJ14-wide work to `pj14-deploy`; user-facing product features such as recharge, subscription, balance, concurrency, and quota distribution should default to Sub2API; this CPA fork should not regain deployment-only files or Portal-first product behavior.
+- Follow-up: Keep `pj14-deploy` documentation authoritative for cross-repository workflow and update the source-fork `AGENTS.md` files when ownership boundaries change.

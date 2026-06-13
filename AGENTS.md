@@ -5,8 +5,18 @@ This is the highest-priority entry document for AI Agents working in this reposi
 CLIProxyAPI is a Go 1.26+ proxy server that provides OpenAI/Gemini/Claude/Codex/Grok-compatible APIs with OAuth, round-robin account routing, provider translation, management APIs, and an embeddable SDK.
 
 ## Repository
-- GitHub: https://github.com/router-for-me/CLIProxyAPI
+- PJ14 fork origin: https://github.com/munanallen-rgb/pj14-cpa
+- Official upstream: https://github.com/router-for-me/CLIProxyAPI
+- Long-lived PJ14 branch: `pj14-cpa`
 - Module: `github.com/router-for-me/CLIProxyAPI/v7`
+
+## PJ14 Scope
+- This repository is the CPA source fork only. Keep CPA source code, SDK code, tests, source-level docs, and source-level packaging assets here.
+- `pj14-deploy` is the PJ14 project control and deployment repository. Put Compose files, cloud instance configs, env templates, deployment runbooks, image tags, backup/deploy scripts, and cross-repository operational docs there.
+- `pj14-sub2api` is the Sub2API source fork. Put user-facing product, billing, payment, subscription, recharge, balance, concurrency, and quota-distribution customizations there.
+- Pull official CPA updates from `upstream` into `pj14-cpa`, then resolve PJ14-specific CPA changes here. Do not push to `upstream`; its push URL should stay disabled.
+- Portal is not the current PJ14 product surface. Current user and admin operations are owned by Sub2API. Do not add, restore, or expand Portal behavior unless the user explicitly asks for Portal work.
+- Do not reintroduce deployment-only assets, Sub2API runtime data, auth files, `.env`, logs, backups, database data, or project operational skills into this source fork.
 
 ## Required Reading Before Every Task
 Before changing code or docs, every Agent must read:
@@ -17,7 +27,8 @@ Before changing code or docs, every Agent must read:
 4. `docs/DIRECTORY_STRUCTURE.md`
 5. `docs/CODING_STANDARDS.md`
 6. `docs/REVIEW_CHECKLIST.md`
-7. Source files and docs directly related to the current task
+7. For PJ14 cross-repository, deployment, or product-surface work, read `../pj14-deploy/AGENTS.md` and `../pj14-deploy/docs/PJ14_PROJECT_GOVERNANCE.md` when available.
+8. Source files and docs directly related to the current task
 
 Do not modify code before understanding the project structure, current conventions, and the relevant implementation.
 

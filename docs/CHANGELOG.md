@@ -24,11 +24,13 @@ Format:
 ## 2026-06-13
 
 ### Added
-- Added a split-repository decision for PJ14: CPA source in `pj14-cliproxyapi`, Sub2API source in `pj14-sub2api`, and deployment orchestration in `pj14-deploy`.
+- Added a split-repository decision for PJ14: CPA source in `pj14-cpa`, Sub2API source in `pj14-sub2api`, and deployment orchestration in `pj14-deploy`.
+- Added a PJ14 governance decision that makes `pj14-deploy` the project control repository, keeps current product operations in Sub2API, and marks Portal as legacy unless explicitly requested.
 
 ### Changed
 - Updated project overview and directory structure docs to treat this repository as the CPA source fork after deployment assets moved to `pj14-deploy`.
 - Simplified `.gitignore` now that PJ14 instance configs, deployment scripts, runtime data directories, and project operational skills are no longer tracked in this CPA source branch.
+- Updated Agent and architecture docs to point PJ14-wide deployment/product work to `pj14-deploy` and `pj14-sub2api` instead of Portal.
 
 ### Fixed
 - Nothing.

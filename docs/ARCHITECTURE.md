@@ -8,7 +8,7 @@ The architecture should stay pragmatic: extend existing modules first and add ne
 ## Main Module Responsibilities
 - `cmd/server/`: process startup, CLI flags, server wiring.
 - `cmd/quota_collector/`: standalone CPA quota collection process for cloud deployments.
-- `cmd/portal_api/`: standalone user Portal API for the PJ14 customer MVP.
+- `cmd/portal_api/`: legacy PJ14 Portal API. It is not the current PJ14 product surface.
 - `internal/api/`: Gin server, protocol multiplexing, request middleware, management endpoints, module registration.
 - `internal/api/modules/amp/`: Amp-specific route support and proxy behavior.
 - `internal/auth/`: provider OAuth/token acquisition and auth file handling.
@@ -21,9 +21,9 @@ The architecture should stay pragmatic: extend existing modules first and add ne
 - `internal/registry/`: model definitions, client-visible models, and updater.
 - `internal/store/`: persistence backends and secret resolution.
 - `internal/cache/`: request signature caching.
-- `internal/cpa_dashboard/`: Postgres reads, quota efficiency calculations, reusable report service methods, and capacity report types used by Portal admin routes.
+- `internal/cpa_dashboard/`: Postgres reads, quota efficiency calculations, reusable report service methods, and capacity report types retained for legacy/reporting paths.
 - `internal/quota_collector/`: collector config, scheduling, CPA management report fetches, quota parsing, and Postgres writes.
-- `internal/portal/`: user registration/login, Portal schema migrations, Sub2API user/key adapter, scoped usage reads, manual recharge orders, ledger entries, admin-only capacity dashboard routes, and embedded MVP static UI.
+- `internal/portal/`: legacy user registration/login, schema migrations, Sub2API adapter, usage reads, recharge ledger, admin capacity routes, and embedded MVP static UI. Do not expand it for PJ14 unless explicitly requested.
 - `internal/wsrelay/`: WebSocket relay lifecycle.
 - `internal/tui/`: terminal UI.
 - `sdk/`: embeddable public-facing API, auth, config, translation, logging, and access packages.
@@ -39,7 +39,9 @@ The architecture should stay pragmatic: extend existing modules first and add ne
 7. Stream, non-stream, or WebSocket response is returned to the client.
 8. Logging, cache, usage, watcher, or management side effects occur through their owning packages.
 
-## User Portal MVP Flow
+## Legacy User Portal MVP Flow
+Portal is retained as legacy source code, but it is not the current PJ14 product surface. Current PJ14 user and admin operations are handled in Sub2API.
+
 1. Browser calls the standalone Portal API.
 2. Portal authenticates users with its own session cookie and stores user state under the `portal` Postgres schema.
 3. Portal maps each Portal user to a Sub2API user through a server-side adapter.
@@ -61,7 +63,7 @@ The architecture should stay pragmatic: extend existing modules first and add ne
 - Do not make management handlers mutate low-level storage or auth details without using the existing owning package patterns.
 - Do not make watcher/diff code depend on API handler internals.
 - Do not make TUI code the source of behavior used by non-TUI paths.
-- Do not expose Sub2API admin credentials or CPA management credentials through Portal frontend routes.
+- Do not expose Sub2API admin credentials or CPA management credentials through any frontend route, including legacy Portal paths.
 
 ## Future Extension Points
 - New provider auth: add under `internal/auth/<provider>` and SDK auth only when needed.

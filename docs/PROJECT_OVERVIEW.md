@@ -21,7 +21,7 @@ Provide a local proxy server that exposes OpenAI/Gemini/Claude/Codex/Grok-compat
 ## Main Functional Areas
 - Server entrypoint and CLI flags: `cmd/server/`.
 - CPA quota collector entrypoint: `cmd/quota_collector/`.
-- User Portal API entrypoint: `cmd/portal_api/`.
+- Legacy PJ14 Portal API entrypoint: `cmd/portal_api/`. Portal is not the current PJ14 product surface.
 - HTTP API, protocol routing, middleware, and management handlers: `internal/api/`.
 - Provider authentication: `internal/auth/` and `sdk/auth/`.
 - Runtime provider execution: `internal/runtime/executor/`.
@@ -31,7 +31,7 @@ Provide a local proxy server that exposes OpenAI/Gemini/Claude/Codex/Grok-compat
 - Config loading and hot reload: `internal/config/`, `internal/watcher/`.
 - Storage: `internal/store/`.
 - CPA quota monitoring and capacity reports: `internal/quota_collector/` and `internal/cpa_dashboard/`.
-- User Portal MVP: `internal/portal/`, backed by a dedicated `portal` schema in the existing Sub2API Postgres database, with an admin-only capacity dashboard that reuses CPA dashboard report logic.
+- Legacy PJ14 Portal implementation: `internal/portal/`. Current PJ14 user, admin, billing, subscription, recharge, balance, concurrency, and quota-distribution operations are owned by Sub2API in the `pj14-sub2api` fork.
 - Embeddable SDK: `sdk/cliproxy/` plus related SDK packages.
 - Integration and compatibility tests: `test/`.
 - Packaging helpers: `Dockerfile` and source-level `docker-compose*.yml`.
@@ -65,10 +65,12 @@ go test -v -run TestName ./path/to/pkg
 Run focused tests for the touched package when possible. Run `go test ./...` for broad or shared behavior changes.
 
 ## Current Project Status
-Active Go service with existing production-facing modules, SDK packages, tests, docs, and Docker assets. PJ14 cloud deployment orchestration now lives in the separate `pj14-deploy` repository. The repository is not empty. Several future modules or changes may be undecided; record those as TBD (待确认) until a concrete design is accepted.
+Active Go service with existing production-facing modules, SDK packages, tests, docs, and Docker assets. PJ14 cloud deployment orchestration and cross-repository project governance now live in the separate `pj14-deploy` repository. This repository is the CPA source fork only. Several future modules or changes may be undecided; record those as TBD (待确认) until a concrete design is accepted.
 
 ## Context New Agents Must Know
 - Root `AGENTS.md` is mandatory reading before any task.
+- For PJ14-wide product or deployment decisions, treat `pj14-deploy` as the project control repository and read its `AGENTS.md` and PJ14 governance docs.
+- Portal is legacy for PJ14. Do not expand Portal unless the user explicitly asks for Portal work; prefer Sub2API for current user-facing product behavior.
 - Avoid standalone changes to `internal/translator/` unless the permission rule in `AGENTS.md` is satisfied.
 - Preserve the `internal/thinking/` canonical config to provider-specific translation flow.
 - `internal/runtime/executor/` is for executors and tests; shared executor helpers belong in `internal/runtime/executor/helps/`.
