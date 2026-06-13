@@ -21,6 +21,23 @@ Format:
 ### Notes
 - ...
 
+## 2026-06-10
+
+### Added
+- Nothing.
+
+### Changed
+- Nothing.
+
+### Fixed
+- Normalized the PJ14 cloud backup remote shell payload to LF before base64 encoding so Windows PowerShell CRLF line endings do not break remote `bash`.
+
+### Removed
+- Nothing.
+
+### Notes
+- Nothing.
+
 ## 2026-06-09
 
 ### Added

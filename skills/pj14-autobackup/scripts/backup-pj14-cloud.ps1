@@ -80,6 +80,7 @@ echo "ARCHIVE=`$archive"
 echo "SHA256=`$archive.sha256"
 "@
 
+$remoteScript = $remoteScript -replace "`r`n", "`n" -replace "`r", "`n"
 $encoded = [Convert]::ToBase64String([System.Text.Encoding]::UTF8.GetBytes($remoteScript))
 $sshBaseArgs = @(
   "-o", "BatchMode=yes",
