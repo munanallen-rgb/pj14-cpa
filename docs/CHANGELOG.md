@@ -21,6 +21,23 @@ Format:
 ### Notes
 - ...
 
+## 2026-06-12
+
+### Added
+- Added an AnixAPI domain-split Nginx example that routes `anixapi.com` to Portal and `api.anixapi.com` to Sub2API while keeping the API-domain root as a JSON pointer.
+
+### Changed
+- Documented the production Portal/Sub2API domain split and the safe `PORTAL_PUBLIC_SUB2API_BASE_URL` setting for `https://api.anixapi.com`.
+
+### Fixed
+- Nothing.
+
+### Removed
+- Nothing.
+
+### Notes
+- The example is not wired into Compose automatically, so existing running services are unaffected until an operator applies the reverse proxy change.
+
 ## 2026-06-10
 
 ### Added

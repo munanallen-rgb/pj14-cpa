@@ -88,6 +88,25 @@ Open:
 http://<server-ip>:18100
 ```
 
+## Public Domain Split
+
+For production domains, keep the product UI and execution API on separate hosts:
+
+```text
+anixapi.com      -> portal-api on 127.0.0.1:18100
+api.anixapi.com  -> sub2api on 127.0.0.1:18080
+```
+
+This keeps `api.anixapi.com` as a machine-facing API endpoint while `anixapi.com` remains the browser-facing product surface. The sample Nginx config in `sub2api-deploy/nginx-anixapi-domain-split.example.conf` is intentionally conservative: `https://api.anixapi.com/` returns a small JSON pointer, and every other API-domain path is forwarded to Sub2API so existing customer integrations are not blocked during rollout.
+
+Set the Portal public API base URL without a trailing `/v1`; Portal appends `/v1` when showing users their API base:
+
+```bash
+PORTAL_PUBLIC_SUB2API_BASE_URL=https://api.anixapi.com
+PORTAL_ALLOWED_ORIGINS=https://anixapi.com
+PORTAL_COOKIE_SECURE=true
+```
+
 ## Main API
 
 - `POST /api/auth/register`
