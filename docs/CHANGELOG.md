@@ -21,6 +21,23 @@ Format:
 ### Notes
 - ...
 
+## 2026-06-20
+
+### Added
+- Nothing.
+
+### Changed
+- Aligned CPA merge-validation tests with upstream xAI image edit endpoint naming, Gemini OAuth removal, and Gemini Responses history rules.
+
+### Fixed
+- Removed empty xAI `reasoning` objects when forwarding requests to models that do not support reasoning effort.
+
+### Removed
+- Nothing.
+
+### Notes
+- CPA was merged toward upstream `v7.2.22` for local validation; the PJ14 auth quota report API remains present.
+
 ## 2026-06-13
 
 ### Added
