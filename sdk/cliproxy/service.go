@@ -215,6 +215,25 @@ func (s *Service) syncPluginModelRuntime(ctx context.Context) {
 	s.coreManager.RefreshSchedulerAll()
 }
 
+func (s *Service) syncLoadedAuthRuntime(ctx context.Context) {
+	if s == nil || s.coreManager == nil {
+		return
+	}
+	if ctx == nil {
+		ctx = context.Background()
+	}
+	auths := s.coreManager.List()
+	if len(auths) == 0 {
+		return
+	}
+	s.registerAvailableExecutors(ctx, executorRegistrationOptions{
+		auths:             auths,
+		forceReplaceAuths: true,
+	})
+	s.registerModelsForAuthBatch(ctx, auths)
+	s.coreManager.RefreshSchedulerAll()
+}
+
 func (s *Service) refreshPluginModelRegistrations(ctx context.Context) {
 	if s == nil || s.pluginHost == nil || s.coreManager == nil {
 		return
@@ -1529,6 +1548,9 @@ func (s *Service) Run(ctx context.Context) error {
 	// legacy clients removed; no caches to refresh
 
 	s.ensureWebsocketGateway()
+	if !homeEnabled {
+		s.syncLoadedAuthRuntime(ctx)
+	}
 	if homeEnabled {
 		s.registerAvailableExecutors(ctx, executorRegistrationOptions{
 			includeBaseline: true,

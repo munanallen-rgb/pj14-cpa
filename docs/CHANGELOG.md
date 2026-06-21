@@ -31,6 +31,7 @@ Format:
 
 ### Fixed
 - Removed empty xAI `reasoning` objects when forwarding requests to models that do not support reasoning effort.
+- Registered already-loaded OAuth auths during non-Home startup so Codex models remain routable after CPA restarts.
 
 ### Removed
 - Nothing.

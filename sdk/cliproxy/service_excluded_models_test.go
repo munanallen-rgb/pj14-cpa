@@ -136,6 +136,80 @@ func TestRegisterModelsForAuth_OpenAICompatibilityImageModelType(t *testing.T) {
 	}
 }
 
+func TestRegisterModelsForAuth_CodexRegistersProviderLookup(t *testing.T) {
+	service := &Service{cfg: &config.Config{}}
+	auth := &coreauth.Auth{
+		ID:       "auth-codex-provider-lookup",
+		Provider: "codex",
+		Status:   coreauth.StatusActive,
+		Attributes: map[string]string{
+			"auth_kind": "oauth",
+			"plan_type": "free",
+		},
+	}
+
+	modelRegistry := internalregistry.GetGlobalRegistry()
+	modelRegistry.UnregisterClient(auth.ID)
+	t.Cleanup(func() {
+		modelRegistry.UnregisterClient(auth.ID)
+	})
+
+	service.registerModelsForAuth(context.Background(), auth)
+
+	models := modelRegistry.GetModelsForClient(auth.ID)
+	var found bool
+	for _, model := range models {
+		if model != nil && strings.TrimSpace(model.ID) == "gpt-5.5" {
+			found = true
+			break
+		}
+	}
+	if !found {
+		t.Fatal("expected gpt-5.5 to be registered for codex free auth")
+	}
+
+	providers := modelRegistry.GetModelProviders("gpt-5.5")
+	if len(providers) != 1 || providers[0] != "codex" {
+		t.Fatalf("providers for gpt-5.5 = %#v, want [codex]", providers)
+	}
+}
+
+func TestSyncLoadedAuthRuntimeRegistersLoadedCodexAuth(t *testing.T) {
+	auth := &coreauth.Auth{
+		ID:       "auth-codex-loaded-runtime",
+		Provider: "codex",
+		Status:   coreauth.StatusActive,
+		Attributes: map[string]string{
+			"auth_kind": "oauth",
+			"plan_type": "free",
+		},
+	}
+	manager := coreauth.NewManager(nil, nil, nil)
+	if _, err := manager.Register(context.Background(), auth); err != nil {
+		t.Fatalf("Register() error = %v", err)
+	}
+	service := &Service{
+		cfg:         &config.Config{},
+		coreManager: manager,
+	}
+
+	modelRegistry := internalregistry.GetGlobalRegistry()
+	modelRegistry.UnregisterClient(auth.ID)
+	t.Cleanup(func() {
+		modelRegistry.UnregisterClient(auth.ID)
+	})
+
+	service.syncLoadedAuthRuntime(context.Background())
+
+	if _, ok := manager.Executor("codex"); !ok {
+		t.Fatal("expected codex executor to be registered for loaded auth")
+	}
+	providers := modelRegistry.GetModelProviders("gpt-5.5")
+	if len(providers) != 1 || providers[0] != "codex" {
+		t.Fatalf("providers for gpt-5.5 = %#v, want [codex]", providers)
+	}
+}
+
 func TestRegisterModelsForAuth_AntigravityFetchesWebSearchCapability(t *testing.T) {
 	var sawFetch bool
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

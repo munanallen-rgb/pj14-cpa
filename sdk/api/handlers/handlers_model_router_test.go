@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/router-for-me/CLIProxyAPI/v7/internal/registry"
 	coreauth "github.com/router-for-me/CLIProxyAPI/v7/sdk/cliproxy/auth"
 	coreexecutor "github.com/router-for-me/CLIProxyAPI/v7/sdk/cliproxy/executor"
 	sdkconfig "github.com/router-for-me/CLIProxyAPI/v7/sdk/config"
@@ -464,6 +465,28 @@ func TestHandlerProvidersForExecutionUsesRouterProvider(t *testing.T) {
 	}
 	if normalizedModel != "claude-sonnet-4" {
 		t.Fatalf("normalizedModel = %q, want claude-sonnet-4", normalizedModel)
+	}
+}
+
+func TestHandlerGetRequestDetailsUsesCodexProviderForRegisteredDecimalModel(t *testing.T) {
+	authID := "handler-codex-decimal-model"
+	model := "gpt-5.5"
+	reg := registry.GetGlobalRegistry()
+	reg.RegisterClient(authID, "codex", []*registry.ModelInfo{{ID: model}})
+	t.Cleanup(func() {
+		reg.UnregisterClient(authID)
+	})
+
+	handler := NewBaseAPIHandlers(&sdkconfig.SDKConfig{}, nil)
+	providers, normalizedModel, errMsg := handler.getRequestDetails(model)
+	if errMsg != nil {
+		t.Fatalf("getRequestDetails() error = %+v", errMsg)
+	}
+	if fmt.Sprint(providers) != "[codex]" {
+		t.Fatalf("providers = %v, want [codex]", providers)
+	}
+	if normalizedModel != model {
+		t.Fatalf("normalizedModel = %q, want %q", normalizedModel, model)
 	}
 }
 
