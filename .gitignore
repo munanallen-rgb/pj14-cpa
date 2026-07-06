@@ -31,6 +31,8 @@ auths/*
 # PJ14 deployment repository owns these paths after the split.
 instances/
 sub2api-deploy/
+/auths
+!auths/.gitkeep
 
 # Documentation
 docs/*
@@ -52,6 +54,7 @@ GEMINI.md
 .worktrees/
 .codex/*
 .claude/*
+.claude
 .gemini/*
 .serena/*
 .agent/*

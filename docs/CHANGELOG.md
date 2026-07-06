@@ -21,6 +21,24 @@ Format:
 ### Notes
 - ...
 
+## 2026-07-06
+
+### Added
+- Nothing PJ14-specific.
+
+### Changed
+- Merged official upstream `router-for-me/CLIProxyAPI` through `5afc0f1d` into the PJ14 CPA branch.
+- Preserved PJ14 source-boundary ignore rules while accepting upstream auth directory ignore rules.
+
+### Fixed
+- Nothing PJ14-specific.
+
+### Removed
+- Nothing.
+
+### Notes
+- `PJ14-CPA-001` loaded OAuth runtime registration remains active after the upstream merge.
+
 ## 2026-06-20
 
 ### Added
