@@ -21,6 +21,24 @@ Format:
 ### Notes
 - ...
 
+## 2026-07-10
+
+### Added
+- Accepted upstream XAI tool-schema handling and executor coverage through CLIProxyAPI `v7.2.61`.
+
+### Changed
+- Merged official upstream `router-for-me/CLIProxyAPI` through `ca67caf0` into the PJ14 CPA branch.
+- Updated the Codex catalog integration assertion for the upstream GPT-5.6 Sol priority change.
+
+### Fixed
+- Nothing PJ14-specific.
+
+### Removed
+- Nothing.
+
+### Notes
+- `PJ14-CPA-001` loaded OAuth runtime registration remains active after the upstream merge.
+
 ## 2026-07-06
 
 ### Added
