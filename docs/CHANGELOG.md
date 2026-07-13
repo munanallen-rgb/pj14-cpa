@@ -21,6 +21,23 @@ Format:
 ### Notes
 - ...
 
+## 2026-07-13
+
+### Added
+- Added Codex streaming coverage for an upstream SSE body that closes without any terminal event.
+
+### Changed
+- Nothing.
+
+### Fixed
+- Codex streaming now reports an explicit timeout-style transport error when the SSE body reaches EOF before a terminal response event, instead of closing the downstream stream as if it completed successfully.
+
+### Removed
+- Nothing.
+
+### Notes
+- Sub2API owns the resulting unknown-usage financial policy; CPA only reports the incomplete stream accurately.
+
 ## 2026-07-10
 
 ### Added
