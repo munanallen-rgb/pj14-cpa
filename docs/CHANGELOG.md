@@ -21,6 +21,24 @@ Format:
 ### Notes
 - ...
 
+## 2026-07-14
+
+### Added
+- Accepted upstream CPA coverage for Codex Alpha Search, session affinity, request logging, and the current OAuth provider callback flow.
+
+### Changed
+- Merged official upstream `router-for-me/CLIProxyAPI` release `v7.2.73` (`2a63b271`) into the PJ14 CPA branch.
+- Updated the custom Codex catalog priority assertion to follow the upstream template maximum dynamically.
+
+### Fixed
+- Nothing PJ14-specific.
+
+### Removed
+- Removed xAI from callback-file test coverage because upstream xAI authentication now uses the device-code flow.
+
+### Notes
+- `PJ14-CPA-001` loaded OAuth runtime registration remains active and is covered by focused verification.
+
 ## 2026-07-13
 
 ### Added
