@@ -21,6 +21,24 @@ Format:
 ### Notes
 - ...
 
+## 2026-07-16
+
+### Added
+- Accepted upstream CPA coverage for request-scoped Codex stream failures, `response.incomplete`, xAI usage, plugin paths, and deferred request error logging.
+
+### Changed
+- Merged official upstream `router-for-me/CLIProxyAPI` release `v7.2.80` (`09da52ad`) into the PJ14 CPA branch.
+- Used the upstream Codex incomplete-stream implementation in place of the narrower PJ14 patch.
+
+### Fixed
+- Removed the redundant PJ14 missing-terminal-event test after the upstream suite superseded it with broader stream and transport coverage.
+
+### Removed
+- Nothing else.
+
+### Notes
+- `PJ14-CPA-001` loaded OAuth runtime registration remains active and unchanged.
+
 ## 2026-07-14
 
 ### Added
