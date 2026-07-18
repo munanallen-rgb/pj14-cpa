@@ -14,12 +14,8 @@ This is the highest-priority entry document for agents working in the PJ14 CPA s
 
 ## Reading Route
 
-For every task, read only:
-
-1. `AGENTS.md`
-2. `docs/PROJECT_OVERVIEW.md`
-
-Then follow the task:
+Read `AGENTS.md` first. Use `docs/PROJECT_OVERVIEW.md` only when the task has no
+clear route below, then follow the task:
 
 - Architecture or new modules: `docs/ARCHITECTURE.md` and `docs/DIRECTORY_STRUCTURE.md`.
 - Go implementation or review: `docs/CODING_STANDARDS.md`; use `docs/REVIEW_CHECKLIST.md` when reviewing or finishing a broad change.
