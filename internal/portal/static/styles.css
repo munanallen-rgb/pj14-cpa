@@ -395,17 +395,6 @@ pre code,
   background: rgba(255, 255, 255, 0.82);
 }
 
-.capacity-toolbar {
-  flex-wrap: wrap;
-}
-
-.capacity-tabs {
-  display: flex;
-  flex: 1 1 100%;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
 .billing-form {
   align-items: end;
 }
@@ -424,23 +413,6 @@ pre code,
   display: flex;
   align-items: center;
   gap: 10px;
-}
-
-.inline-control {
-  width: min(210px, 100%);
-  display: grid;
-  grid-template-columns: auto minmax(90px, 1fr);
-  align-items: center;
-  gap: 8px;
-}
-
-.inline-control span {
-  margin: 0;
-}
-
-.notice-panel {
-  color: var(--amber);
-  white-space: pre-line;
 }
 
 .code-row {

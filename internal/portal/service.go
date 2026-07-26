@@ -6,17 +6,14 @@ import (
 	"fmt"
 	"strings"
 	"time"
-
-	cpadashboard "github.com/router-for-me/CLIProxyAPI/v7/internal/cpa_dashboard"
 )
 
 // Service coordinates Portal business operations.
 type Service struct {
-	cfg       Config
-	store     *Store
-	sub2api   Sub2API
-	dashboard *cpadashboard.Service
-	now       func() time.Time
+	cfg     Config
+	store   *Store
+	sub2api Sub2API
+	now     func() time.Time
 }
 
 // NewService creates a Portal service.
@@ -27,11 +24,6 @@ func NewService(cfg Config, store *Store, sub2api Sub2API) *Service {
 		sub2api: sub2api,
 		now:     time.Now,
 	}
-}
-
-// SetDashboardService attaches the read-only CPA capacity reports used by Portal admins.
-func (s *Service) SetDashboardService(dashboard *cpadashboard.Service) {
-	s.dashboard = dashboard
 }
 
 // BootstrapAdmin creates the first admin when bootstrap credentials are configured.
@@ -242,58 +234,6 @@ func (s *Service) AdminCancelRechargeOrder(ctx context.Context, admin User, orde
 		return ErrForbidden
 	}
 	return s.store.CancelRechargeOrder(ctx, orderID, admin.ID)
-}
-
-func (s *Service) AdminDashboardOverview(ctx context.Context, admin User) (cpadashboard.OverviewResponse, error) {
-	if errAdmin := s.requireAdminDashboard(admin); errAdmin != nil {
-		return cpadashboard.OverviewResponse{}, errAdmin
-	}
-	return s.dashboard.Overview(ctx)
-}
-
-func (s *Service) AdminDashboardQuotaEfficiency(ctx context.Context, admin User, filter cpadashboard.QueryFilter) (cpadashboard.EfficiencyResponse, error) {
-	if errAdmin := s.requireAdminDashboard(admin); errAdmin != nil {
-		return cpadashboard.EfficiencyResponse{}, errAdmin
-	}
-	return s.dashboard.QuotaEfficiency(ctx, filter)
-}
-
-func (s *Service) AdminDashboardCurrentAccounts(ctx context.Context, admin User, cpa string) ([]cpadashboard.CPAAccountRow, error) {
-	if errAdmin := s.requireAdminDashboard(admin); errAdmin != nil {
-		return nil, errAdmin
-	}
-	return s.dashboard.CurrentAccounts(ctx, strings.TrimSpace(cpa))
-}
-
-func (s *Service) AdminDashboardUsageBuckets(ctx context.Context, admin User, filter cpadashboard.QueryFilter) ([]cpadashboard.UsageBucket, error) {
-	if errAdmin := s.requireAdminDashboard(admin); errAdmin != nil {
-		return nil, errAdmin
-	}
-	return s.dashboard.UsageBuckets(ctx, filter)
-}
-
-func (s *Service) AdminDashboardCleanupCandidates(ctx context.Context, admin User, cpa string) ([]cpadashboard.CleanupCandidate, error) {
-	if errAdmin := s.requireAdminDashboard(admin); errAdmin != nil {
-		return nil, errAdmin
-	}
-	return s.dashboard.CleanupCandidates(ctx, strings.TrimSpace(cpa))
-}
-
-func (s *Service) AdminDashboardFilters(ctx context.Context, admin User) (cpadashboard.FiltersResponse, error) {
-	if errAdmin := s.requireAdminDashboard(admin); errAdmin != nil {
-		return cpadashboard.FiltersResponse{}, errAdmin
-	}
-	return s.dashboard.Filters(ctx)
-}
-
-func (s *Service) requireAdminDashboard(admin User) error {
-	if admin.Role != roleAdmin {
-		return ErrForbidden
-	}
-	if s.dashboard == nil {
-		return fmt.Errorf("%w: admin dashboard is not configured", ErrNotFound)
-	}
-	return nil
 }
 
 func (s *Service) ensureSub2APIUser(ctx context.Context, user User) (Sub2APIUserMapping, error) {

@@ -20,7 +20,6 @@ Provide a local proxy server that exposes OpenAI/Gemini/Claude/Codex/Grok-compat
 
 ## Main Functional Areas
 - Server entrypoint and CLI flags: `cmd/server/`.
-- CPA quota collector entrypoint: `cmd/quota_collector/`.
 - Legacy PJ14 Portal API entrypoint: `cmd/portal_api/`. Portal is not the current PJ14 product surface.
 - HTTP API, protocol routing, middleware, and management handlers: `internal/api/`.
 - Provider authentication: `internal/auth/` and `sdk/auth/`.
@@ -30,7 +29,6 @@ Provide a local proxy server that exposes OpenAI/Gemini/Claude/Codex/Grok-compat
 - Model registry and updates: `internal/registry/`.
 - Config loading and hot reload: `internal/config/`, `internal/watcher/`.
 - Storage: `internal/store/`.
-- CPA quota monitoring and capacity reports: `internal/quota_collector/` and `internal/cpa_dashboard/`.
 - Legacy PJ14 Portal implementation: `internal/portal/`. Current PJ14 user, admin, billing, subscription, recharge, balance, concurrency, and quota-distribution operations are owned by Sub2API in the `pj14-sub2api` fork.
 - Embeddable SDK: `sdk/cliproxy/` plus related SDK packages.
 - Integration and compatibility tests: `test/`.

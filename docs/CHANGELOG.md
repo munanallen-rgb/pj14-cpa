@@ -21,6 +21,12 @@ Format:
 ### Notes
 - ...
 
+## 2026-07-26
+
+### Removed
+- Removed the dormant CPA quota collector command and package after all current environments stopped deploying it.
+- Removed the retired Portal CPA capacity dashboard and its `cpa_monitor` report package; historical database tables remain a deployment-owned retention concern.
+
 ## 2026-07-16
 
 ### Added

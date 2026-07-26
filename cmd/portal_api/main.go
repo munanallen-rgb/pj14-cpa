@@ -7,7 +7,6 @@ import (
 	"os/signal"
 	"syscall"
 
-	cpadashboard "github.com/router-for-me/CLIProxyAPI/v7/internal/cpa_dashboard"
 	"github.com/router-for-me/CLIProxyAPI/v7/internal/portal"
 	log "github.com/sirupsen/logrus"
 )
@@ -38,21 +37,6 @@ func main() {
 
 	sub2apiClient := portal.NewSub2APIClient(cfg.Sub2API)
 	service := portal.NewService(cfg, store, sub2apiClient)
-
-	dashboardStore, errDashboardStore := cpadashboard.NewStore(ctx, cpadashboard.DatabaseConfig{
-		Host:     cfg.Database.Host,
-		Port:     cfg.Database.Port,
-		User:     cfg.Database.User,
-		Password: cfg.Database.Password,
-		Name:     cfg.Database.Name,
-		SSLMode:  cfg.Database.SSLMode,
-	})
-	if errDashboardStore != nil {
-		log.WithError(errDashboardStore).Error("failed to initialize portal admin dashboard store")
-		os.Exit(1)
-	}
-	defer dashboardStore.Close()
-	service.SetDashboardService(cpadashboard.NewService(dashboardStore))
 
 	if errBootstrap := service.BootstrapAdmin(ctx); errBootstrap != nil {
 		log.WithError(errBootstrap).Error("failed to bootstrap portal admin")

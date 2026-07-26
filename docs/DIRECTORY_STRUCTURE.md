@@ -37,7 +37,6 @@ The cloud deployment path remains `/opt/cpa-sub2api`, but that runtime shape is 
 - `.github/`: GitHub workflows and repository automation.
 - `assets/`: README and documentation images/assets.
 - `cmd/`: executable entrypoints and small command utilities.
-- `cmd/quota_collector/`: cloud quota collector entrypoint for recording CPA auth quota snapshots.
 - `cmd/portal_api/`: legacy Portal API entrypoint. It is not the current PJ14 product surface.
 - `docs/`: engineering, SDK, and project documentation.
 - `examples/`: runnable examples for SDK or provider usage.
@@ -50,9 +49,7 @@ The cloud deployment path remains `/opt/cpa-sub2api`, but that runtime shape is 
 - `internal/thinking/`: reasoning config pipeline.
 - `internal/translator/`: protocol translators.
 - `internal/watcher/`: config hot reload and diff/synthesis logic.
-- `internal/quota_collector/`: CPA quota collector configuration, scheduling, report parsing, and Postgres persistence.
-- `internal/cpa_dashboard/`: read-only capacity report queries, quota efficiency metrics, reusable report service methods, and report types retained for legacy/reporting paths.
-- `internal/portal/`: legacy Portal configuration, schema migrations, user/session logic, Sub2API adapter, user-scoped usage queries, manual recharge ledger, admin-only capacity dashboard routes, and embedded MVP static UI.
+- `internal/portal/`: legacy Portal configuration, schema migrations, user/session logic, Sub2API adapter, user-scoped usage queries, manual recharge ledger, and embedded MVP static UI.
 - `sdk/`: public embeddable packages.
 - `test/`: cross-module integration tests.
 

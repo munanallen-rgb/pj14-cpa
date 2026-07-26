@@ -7,7 +7,6 @@ The architecture should stay pragmatic: extend existing modules first and add ne
 
 ## Main Module Responsibilities
 - `cmd/server/`: process startup, CLI flags, server wiring.
-- `cmd/quota_collector/`: standalone CPA quota collection process for cloud deployments.
 - `cmd/portal_api/`: legacy PJ14 Portal API. It is not the current PJ14 product surface.
 - `internal/api/`: Gin server, protocol multiplexing, request middleware, management endpoints, module registration.
 - `internal/api/modules/amp/`: Amp-specific route support and proxy behavior.
@@ -21,9 +20,7 @@ The architecture should stay pragmatic: extend existing modules first and add ne
 - `internal/registry/`: model definitions, client-visible models, and updater.
 - `internal/store/`: persistence backends and secret resolution.
 - `internal/cache/`: request signature caching.
-- `internal/cpa_dashboard/`: Postgres reads, quota efficiency calculations, reusable report service methods, and capacity report types retained for legacy/reporting paths.
-- `internal/quota_collector/`: collector config, scheduling, CPA management report fetches, quota parsing, and Postgres writes.
-- `internal/portal/`: legacy user registration/login, schema migrations, Sub2API adapter, usage reads, recharge ledger, admin capacity routes, and embedded MVP static UI. Do not expand it for PJ14 unless explicitly requested.
+- `internal/portal/`: legacy user registration/login, schema migrations, Sub2API adapter, usage reads, recharge ledger, and embedded MVP static UI. Do not expand it for PJ14 unless explicitly requested.
 - `internal/wsrelay/`: WebSocket relay lifecycle.
 - `internal/tui/`: terminal UI.
 - `sdk/`: embeddable public-facing API, auth, config, translation, logging, and access packages.
@@ -49,7 +46,6 @@ Portal is retained as legacy source code, but it is not the current PJ14 product
 5. End-user inference traffic goes directly to Sub2API `/v1`, not through Portal.
 6. Portal reads Sub2API `public.usage_logs` only for mapped key ids.
 7. Admin-confirmed recharge orders create immutable Portal ledger entries and call Sub2API to add balance.
-8. Portal admins can view capacity, quota efficiency, account health, usage trend, and cleanup-candidate reports through Portal routes that reuse `internal/cpa_dashboard` service logic.
 
 ## Boundaries
 - API handlers should not own provider-specific upstream details; delegate to executors, translators, auth, config, or registry packages.
