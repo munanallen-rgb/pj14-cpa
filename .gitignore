@@ -10,7 +10,7 @@ config.yaml
 bin/*
 backups/*
 data_compare/
-logs/*
+/logs
 conv/*
 temp/*
 refs/*
