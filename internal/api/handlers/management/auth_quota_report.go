@@ -155,7 +155,7 @@ func (h *Handler) fetchCodexQuotaForReport(ctx context.Context, auth *coreauth.A
 
 	httpClient := &http.Client{
 		Timeout:   defaultAPICallTimeout,
-		Transport: h.apiCallTransport(auth),
+		Transport: h.apiCallTransport(auth, ""),
 	}
 	resp, errDo := httpClient.Do(req)
 	if errDo != nil {
