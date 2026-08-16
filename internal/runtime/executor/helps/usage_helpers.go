@@ -329,8 +329,8 @@ func (r *UsageReporter) setTTFT(ttft time.Duration) {
 	if r == nil {
 		return
 	}
-	if ttft < 0 {
-		ttft = 0
+	if ttft <= 0 {
+		ttft = time.Nanosecond
 	}
 	r.ttftMu.Lock()
 	if r.ttftSet {

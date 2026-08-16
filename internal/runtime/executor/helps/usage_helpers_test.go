@@ -589,6 +589,15 @@ func TestUsageReporterTrackHTTPClientStartsTTFTBeforeRoundTrip(t *testing.T) {
 	}
 }
 
+func TestUsageReporterObservedTTFTIsPositiveAtClockResolution(t *testing.T) {
+	reporter := NewUsageReporter(context.Background(), "openai", "gpt-5.4", nil)
+	reporter.setTTFT(0)
+
+	if got := reporter.ttftDuration(); got != time.Nanosecond {
+		t.Fatalf("ttft = %v, want %v", got, time.Nanosecond)
+	}
+}
+
 func TestUsageReporterBuildRecordIncludesRequestedModelAlias(t *testing.T) {
 	ctx := usage.WithRequestedModelAlias(context.Background(), "client-gpt")
 	reporter := NewUsageReporter(ctx, "openai", "gpt-5.4", nil)

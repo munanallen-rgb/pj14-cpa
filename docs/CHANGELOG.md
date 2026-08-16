@@ -21,6 +21,15 @@ Format:
 ### Notes
 - ...
 
+## 2026-08-16
+
+### Changed
+- Merged official upstream `router-for-me/CLIProxyAPI` release `v7.2.133` (`7efe0a7c`) into the PJ14 CPA branch.
+
+### Fixed
+- Normalized an observed zero or negative time-to-first-token duration to `1ns`, preserving the distinction between an observed first byte and absent timing data.
+- Updated cross-platform executor assertions and the source-copy invariant for the current upstream tree and generated `temp/` artifacts.
+
 ## 2026-07-26
 
 ### Removed
